@@ -4,7 +4,7 @@ import AxeBuilder from '@axe-core/playwright';
 
 test('Chinese emphasis renders without leaking Markdown punctuation into prose', async ({ page }) => {
   for (const [id, label] of [
-    ['book/06-memory', '跨任务的持久信息'],
+    ['book/10-project-comparisons', '为了让这个助手把两天行程安排好'],
     ['references/studies/tool-results-and-retries', '默认策略不是捕获所有工具执行异常'],
     ['references/studies/trust-and-tool-content', '来源提示与技术强制的边界'],
   ]) {
@@ -32,9 +32,9 @@ test('search opens a chapter, follows its sources and preserves browser navigati
   await expect(page.locator('.prose a[href*="github.com/langchain-ai/langgraph/blob/41c9c22"]')).not.toHaveCount(0);
   await page.goBack();
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('从断点继续，为什么会再做一遍？');
-  await page.locator('.on-this-page a').filter({ hasText: '第二种安排' }).click();
+  await page.locator('.on-this-page a').filter({ hasText: '第二种改法' }).click();
   await expect(page).toHaveURL(/#/);
-  await expect(page.locator('.prose h2').filter({ hasText: '第二种安排' })).toBeInViewport();
+  await expect(page.locator('.prose h2').filter({ hasText: '第二种改法' })).toBeInViewport();
   expect(errors).toEqual([]);
 });
 
@@ -80,7 +80,7 @@ test('later chapters remain connected and all experiment attachments are public'
   }
   await page.goto('/?read=book%2F22-evaluation-and-completion');
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('评测系统：让任务完成成为可复核的结论');
-  await expect(page.locator('.prose')).toContainText('job-43');
+  await expect(page.locator('.prose')).toContainText('周日返程');
   const manifestResponse = await page.request.get('/downloads/experiments/manifest.json');
   expect(manifestResponse.ok()).toBe(true);
   const manifest = await manifestResponse.json();
@@ -99,7 +99,7 @@ test('later chapters remain connected and all experiment attachments are public'
 
 test('theme and reading size survive a reload and Escape returns search focus', async ({ page }) => {
   await page.goto('/?read=book%2F06-memory');
-  await expect(page.locator('.prose')).toContainText('昨天');
+  await expect(page.locator('.prose')).toContainText('安静');
   await page.getByRole('button', { name: '增大字号' }).click();
   await expect(page.locator('.prose')).toHaveCSS('font-size', '19px');
   await page.getByRole('button', { name: /点击切换主题/ }).click();
@@ -190,11 +190,11 @@ for (const width of [375, 1440]) {
       await page.goto('/?read=book%2F15-memory-update-boundaries');
       await expect(page.locator('.diagram-image svg')).toHaveCount(1);
       await expect(page.locator('.reading-callout').first()).toBeVisible();
-      await expect(page.locator('.reading-callout').first()).toContainText('保存成功');
+      await expect(page.locator('.reading-callout').first()).toContainText('文件里有这句话');
       await expect(page.locator('.prose')).not.toContainText('[!NOTE]');
       await expect(page.locator('.prose')).not.toContainText('**');
       const comparison = page.locator('.table-scroll').first();
-      await expect(comparison.locator('th')).toHaveText(['观察对象', '内容', '对任务的含义']);
+      await expect(comparison.locator('th')).toHaveText(['记录或输入', '内容', '本次应该怎样处理']);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       const findings = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze();
       expect(findings.violations.map(({ id }) => id)).toEqual([]);
@@ -289,5 +289,7 @@ test('whole-book print includes every chapter, complete diagrams and both langua
   const ids = await page.locator('[id]').evaluateAll(nodes => nodes.map(node => node.id));
   expect(new Set(ids).size).toBe(ids.length);
   await expect(page.locator('.print-book')).not.toContainText('**');
+  await expect(page.locator('.print-book')).toContainText('杭州');
+  await expect(page.locator('.print-book')).not.toContainText(/R42|run-807|job-42|job-43|E42/);
   expect(errors).toEqual([]);
 });

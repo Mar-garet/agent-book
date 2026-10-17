@@ -1,160 +1,174 @@
 # 明明限制了步数，为什么还能花掉更多资源？
 
-把父运行设为“最多两轮”，整项任务就只做两轮工作吗？本书的确定性实验出现了另一个结果：父模型替身调用两次，子模型替身也调用两次，共四次。父运行正常结束，限制并没有失效，它约束的是当前那次运行。
+交通助手查车次，住宿助手查房间，协调者还要把材料合起来检查。若每个助手都能再开一个子任务、失败后又能多试几次，整份行程可能还没核对完，程序的调用额度已经耗尽。
 
-R42 协调者面对同样的设计问题。日志与数据研究者各拿一份轮数，补查又能另起子任务，失败后还可重试。最后材料很多，却可能没有资源核对测试产物是否覆盖 15–16 日。
+这里先分清两种预算。1500 元是用户这次旅行能花的钱，用来计算往返高铁、一晚住宿、餐饮和市内交通估算；模型或 API 调用费用，是运行助手的成本。下面讨论的是后者。给最后检查留几次模型调用，不是从旅行预算里扣钱。
 
-预算要回答四件事：谁计数、计什么、何时检查、哪些执行者共享。它既是成本管理，也是确保任务还能正确收尾的设计。
+一次程序运行被设成“最多两轮”，也未必代表所有助手加起来只调用两次模型。要控制整项工作的开销，先要知道程序到底在数什么。
 
-## 一个数字不能同时代表所有资源
+## 一步、一轮、一次请求，不一定是一回事
 
-一次模型输出可以包含多个工具，工具可以启动子 Agent，图节点可以提交多项业务动作。一次模型轮次内部还可能重试提供方请求。因此，模型轮、网络尝试、工具数、图步、并发度、token、持续时间与金额不能互换。
+模型一次回答可能提出多个查询；一个查询工具可能调用子助手；一个程序步骤也可能运行几段代码。网络失败后，同一轮里还可能重发请求。
 
-| 限制位置 | 实际约束 | 还不能直接保证 |
+因此，限制同时运行几项、最多推进几步、最多请求几次模型，解决的是不同问题。
+
+| 想限制什么 | 应该数什么 | 不能用什么简单代替 |
 | --- | --- | --- |
-| SDK 当前 Runner 的轮数 | 本运行继续调用模型多少轮 | 子 Runner 的总工作 |
-| 图的调度步 | 状态推进多少步 | 每节点内的动作数量 |
-| 重试策略 | 一项工作的尝试次数 | 全任务各处重试的合计 |
-| 并发度 | 同时运行多少项 | 最终总调用或总费用 |
-| 请求 token / 金额检查 | 指定调用链中的相应用量 | 未计入路径的后台消费 |
+| 同时发出太多查询 | 并发请求数 | 最终请求总数 |
+| 模型反复想而不结束 | 相应运行中的模型轮数 | 全部子助手的调用次数 |
+| 一段流程不停推进 | 流程步骤数 | 每一步内部的工具次数 |
+| 总请求或总费用 | 各消费处的实际尝试与用量 | 聊天消息条数 |
 
-准确记账也不同于执行前限制。结束后显示总花费，能帮助分析；动作前原子分配额度，才能阻止下一次超额开始。设计时先确定需要哪一种承诺。
+结束后准确显示花了多少，只完成了记账。要阻止下一次超额调用，程序还得在发出请求之前检查并分配额度。
 
-## SDK 的轮数属于哪一次运行
+## 父助手两轮，为什么父子加起来有四次
 
-OpenAI Agents SDK 的交接继续使用当前 Runner，工具式委派则可以启动新的子 Runner。父上限没有自然变成子运行余额。
+OpenAI Agents SDK 的交接继续使用当前 Runner；把另一个 Agent 当工具时，可以启动新的子 Runner。Runner 是组织一次模型与工具循环的运行器，各自可以持有自己的轮数。
 
-本书以真实 Runner 配预编排模型替身得到以下结果，没有调用远程模型：
+本书用真实 Runner 和预先安排响应的模型替身，运行了几种情况，没有访问真实模型或旅行服务：
 
-| 场景 | 父模型替身次数 | 子模型替身次数 | 运行结果 |
+| 运行安排 | 父方模型替身调用 | 子方模型替身调用 | 结果 |
 | --- | --- | --- | --- |
-| 交接，父上限 1 | 1 | 0 | 接收者执行前超限 |
-| 交接，父上限 2 | 1 | 1 | 接收者返回 |
-| Agent 工具，父上限 2，子默认 | 2 | 2 | 共四次调用，父返回 |
-| Agent 工具，父上限 1，子默认 | 1 | 2 | 子完成后，父超限 |
+| 交接，外层上限 1 | 1 | 0 | 接收者尚未调用就超限 |
+| 交接，外层上限 2 | 1 | 1 | 接收者返回 |
+| 子 Agent 当工具，父上限 2，子默认 | 2 | 2 | 共四次调用，父返回 |
+| 子 Agent 当工具，父上限 1，子默认 | 1 | 2 | 子完成后，父超限 |
 
-最后一行尤其重要：上限阻止父运行下一轮，不能让子工作变成没有发生。Hermes 也在构造子 Agent 时建立新的迭代预算；Cline SDK 的每次 execute 重新初始化本次迭代计数。局部上限可以完全正确，根任务仍不断领取新额度。
+上限没有失效。它阻止的是父运行的下一轮，不能取消子运行已经做过的工作。
 
-反过来，共享用量也需要显式连接。Pydantic AI 的航班示例在工具内调用子 Agent 时传入父的 usage，让子请求进入同一份统计。共享统计提供总量依据，执行前如何拒绝还需配相应限制。不能从对象叫“context”就推断所有子工作自动共用金额硬上限。
+Hermes 创建子 Agent 时也可以建立新的迭代预算；Cline SDK 的一次 execute 会初始化本次迭代计数。若应用不断开启新运行，局部上限可能一直遵守，整体却不断领取新额度。
 
-## 图的调度步，数的又是什么
+Pydantic AI 的一个示例则显式把父方的 usage 传给子 Agent，让子请求进入同一份用量统计。这能帮助看清合计，但统计与阻止超额仍是两回事；不能只因为父子共享一个对象，就认为所有请求已经受到同一上限保护。
 
-本书的同步图实验把三次模拟创建放进一个工具节点。调度上限为 1 时，三次写入已发生，随后图报步数超限；设为 2，同一批次可正常结束。另一图在三步里每步执行两个模拟动作，合计六次。
+## 流程走一步，内部可能做很多事
 
-节点里做多少事，由节点内部实现决定。LangGraph 的递归上限无法替业务服务限制写入数；LangGraph JavaScript 也把图步、并发与任务重试分别处理。Deep Agents 的工厂绑定较大的图推进上限，不能因此把这个数当生产费用预算。
+LangGraph 的调度步骤安排节点执行，节点内部又能调用多个工具。开发者把它设为一步，不代表这一步只能查一次车票。
 
-Agent Framework 把函数循环的模型往返、函数总调用和持续时长分别配置；CrewAI 的 Agent 迭代上限与内部 Flow 方法调用上限也是不同单位。这些实现值得借鉴的地方，是把计数对象说清楚，而不是寻找一个包揽全部资源的“最大步数”。
+本书另一组独立实验，在一个工具节点里放入三次模拟创建。图上限为 1 时，三次写入已经发生，图随后报步数超限；设为 2，同一批次可以结束。还有一个图在三步里每步做两个模拟动作，一共六次。
 
-## 轮数结束以后，系统可能还要做什么
+这些不是旅行操作实测，而是检查计数位置。它说明图步数不会自然限制节点内的写入数，超限报错也不会撤销已经发生的动作。
 
-停止主循环不一定立即停止所有模型消费。Semantic Kernel 自动函数调用达到上限后，可以关闭函数调用再请求最终回答；Smolagents 动作步达到上限后也会尝试生成最终答复，规划步骤本身又可能额外调用模型。AgentScope 的普通迭代之外，还可能给结构化收尾保留宽限轮数。
+Agent Framework 将模型往返、函数调用总数和持续时长分开配置；CrewAI 也分别限制 Agent 的迭代和内部流程函数的调用：一轮处理可能调用多个函数，不能当作同一个数量。Deep Agents 工厂设置的图推进上限同样不能直接解释成费用额度。
 
-这些安排有合理目的：让用户得到可读的停止说明，或者把部分结果整理成约定格式。代价是产品不能把一个迭代配置直接展示为“最多请求模型这么多次”。收尾、摘要、judge、后台记忆整理，都要归入明确的消费来源。
+设计旅行助手时，可以同时设置这些限制：避免一个助手想太久，避免一次并发太多查询，再单独限制整项工作的调用总量。它们应该互相补充，而不是争用同一个“最大步数”。
 
-Qwen Code 把用户会话轮数与 Goal 运行预算分开，避免自动任务挤占交互额度；统一监控却必须再把来源汇合。OpenCode 达到步骤上限后禁止继续用工具并加入收尾提示，提示与执行拒绝在这里配合，仍未把它变成全任务树费用账本。
+## 到达上限之后，程序可能还要请求一次模型
 
-## 恢复时，额度是否跟着任务走
+系统通常还想给用户一个可读的结束说明。Semantic Kernel 的自动函数调用达到上限后，可以关闭函数调用，再请求最终回答；Smolagents 达到动作步数上限后，也会尝试生成最终答复。Smolagents 另外插入的规划步骤同样可能消耗模型请求。
 
-跨日任务若每次恢复都领一份完整预算，总消费依然可能失控。稳定业务任务身份应跨会话、执行者和恢复入口延续，已经消费的记录也随之保留。
+AgentScope 在普通迭代之外，还可以为生成符合要求的结构化结果留出几轮。这些安排有用途，却意味着界面不能把迭代上限简单写成“总共最多调用模型这么多次”。
 
-用已保存 RunState 恢复，与拿相似消息新开 Runner 不同；图的单次停止位置，也不能自动解释成跨全部调用的永久总上限。OpenCode 的恢复次数限制能抑制无界重启，但尝试次数与已付费用仍是不同账本。
+摘要、检查模型、后台记忆整理也可能另外消费。Qwen Code 把用户会话轮数与 Goal 自动任务预算分开，统一监控时还要把不同来源合起来。OpenCode 达到步骤限制后，既提示收尾，也在执行层禁止继续使用工具；只加一句“请结束”则没有同样作用。
 
-时间预算也要分层。Gemini CLI 子运行按轮数和截止时间检查停止；OpenClaw 对执行与结算分别设期限。为查询结果和写入记录预留时间，能避免执行刚结束就因总超时丢失收尾。停止本地等待后，远端任务可能仍消耗资源，必须继续保留其编号与待核对费用。
+## 暂停后继续，不能自动领一份新预算
 
-## 共享预算需要在动作前分配
+用户说“先等等”，旅行计划保存下来。稍后继续时，如果程序只恢复聊天，又重新给每名助手一整份额度，总消费就会不断增加。
 
-根任务账本应区分已消费、已预留、可再分配。子任务先领额度再行动，结束后按实际用量结算。多个并发申请必须原子处理，否则它们可能同时读到“还有一次”，各自开始一次。
+应用需要保留“这还是同一次旅行规划”以及已经用掉多少。SDK 可以把原来的运行信息保存为 RunState，包括已经用了几轮。用这份记录继续，与拿着相似消息新开一次运行不同；单次图执行的步数上限，也不是跨天的总额度。
 
-未知结果不能立即释放全部预留。旧请求可能仍在执行，此时把额度交给新任务，会让两份消费同时存在。业务幂等只控制同动作的效果，资源账本还要记录重试确实增加的请求成本。
+时间同样要管。Gemini CLI 子运行检查轮数和截止时间；OpenClaw 对执行与结果结算分别设置期限。查询结束后，还要有时间读取结果、保存记录、解释未完成事项。
 
-下面用固定整数单位演示。总额度 10，其中 2 留给验收；探索不能占用保护部分。一次未知尝试仍占 4，日志查询按实际 2 结算，所以额外探索被拒，验收仍能申请。它是单进程设计示例，没有价格估算或持久数据库，两个版本打印同样结果。
+停止本地等待不代表远端服务立刻停止消费。如果请求还在运行，就保留它的编号和未结算用量，不能直接把额度全部退回再发一个新的。
+
+## 先分配，再调用；不确定的消费先留着
+
+要约束父子合计，可以让所有昂贵请求经过同一份记录。它列出三项：已经消费、已经分给正在工作的助手、还能分配多少。这里把这份记录称为共享账本。
+
+子助手开始前先申请，结束后按实际用量结算。多个助手同时申请时，检查和分配要连在一起完成，不能让它们各自读到“还有一次”后都开始。
+
+下面的设计示例用模型调用次数表示额度。总共 10 次，其中 2 次保留给最后核对。交通助手先领 3 次，住宿助手领 4 次；额外研究申请被拒绝。交通实际用了 2 次，归还剩余 1 次；住宿还没报结果，4 次仍保留，最后核对依然能申请。
+
+示例只演示分配和结算，不调用模型，也不计算旅游费用。两种语言打印相同结果。
 
 ```typescript
-class Ledger {
-  spent = 0;
-  holds = new Map<string, number>();
-  constructor(limit: number, protectedUnits: number) {
-    this.limit = limit; this.protectedUnits = protectedUnits;
+class CallBudget {
+  used = 0;
+  held = new Map<string, number>();
+  constructor(limit: number, protectedCalls: number) {
+    this.limit = limit; this.protectedCalls = protectedCalls;
   }
   readonly limit: number;
-  readonly protectedUnits: number;
-  get held(): number { return [...this.holds.values()].reduce((a, b) => a + b, 0); }
-  reserve(id: string, units: number, verification = false): void {
-    const ceiling = this.limit - (verification ? 0 : this.protectedUnits);
-    if (!Number.isInteger(units) || units <= 0 || this.holds.has(id))
-      throw new Error("invalid reservation");
-    if (this.spent + this.held + units > ceiling) throw new Error("budget");
-    this.holds.set(id, units);
+  readonly protectedCalls: number;
+  get reserved(): number { return [...this.held.values()].reduce((a, b) => a + b, 0); }
+  reserve(task: string, calls: number, finalCheck = false): void {
+    const ceiling = this.limit - (finalCheck ? 0 : this.protectedCalls);
+    if (!Number.isInteger(calls) || calls <= 0 || this.held.has(task))
+      throw new Error("invalid request");
+    if (this.used + this.reserved + calls > ceiling) throw new Error("budget");
+    this.held.set(task, calls);
   }
-  settle(id: string, actual: number): void {
-    const reserved = this.holds.get(id);
-    if (reserved === undefined || !Number.isInteger(actual) ||
-        actual < 0 || actual > reserved) throw new Error("invalid settlement");
-    this.holds.delete(id);
-    this.spent += actual;
+  settle(task: string, actual: number): void {
+    const held = this.held.get(task);
+    if (held === undefined || !Number.isInteger(actual) || actual < 0 || actual > held)
+      throw new Error("invalid usage");
+    this.held.delete(task); this.used += actual;
   }
 }
-const ledger = new Ledger(10, 2);
-ledger.reserve("logs", 3);
-ledger.reserve("unknown-attempt", 4);
-try { ledger.reserve("extra", 2); }
-catch { console.log("exploration blocked"); }
-ledger.settle("logs", 2);
-ledger.reserve("verify", 2, true);
-console.log("verification reserved");
-console.log(`spent=${ledger.spent} held=${ledger.held}`);
+const budget = new CallBudget(10, 2);
+budget.reserve("traffic", 3);
+budget.reserve("hotel-running", 4);
+try { budget.reserve("extra-research", 2); }
+catch { console.log("research stopped"); }
+budget.settle("traffic", 2);
+budget.reserve("final-check", 2, true);
+console.log("final check reserved");
+console.log(`used=${budget.used} held=${budget.reserved}`);
 ```
 ```python
-class Ledger:
-    def __init__(self, limit: int, protected_units: int):
-        self.limit, self.protected_units = limit, protected_units
-        self.spent = 0
-        self.holds: dict[str, int] = {}
+class CallBudget:
+    def __init__(self, limit: int, protected_calls: int):
+        self.limit, self.protected_calls = limit, protected_calls
+        self.used = 0
+        self.held: dict[str, int] = {}
 
     @property
-    def held(self) -> int:
-        return sum(self.holds.values())
+    def reserved(self) -> int:
+        return sum(self.held.values())
 
-    def reserve(self, key: str, units: int, verification: bool = False):
-        ceiling = self.limit - (0 if verification else self.protected_units)
-        if type(units) is not int or units <= 0 or key in self.holds:
-            raise ValueError("invalid reservation")
-        if self.spent + self.held + units > ceiling:
+    def reserve(self, task: str, calls: int, final_check: bool = False):
+        ceiling = self.limit - (0 if final_check else self.protected_calls)
+        if type(calls) is not int or calls <= 0 or task in self.held:
+            raise ValueError("invalid request")
+        if self.used + self.reserved + calls > ceiling:
             raise ValueError("budget")
-        self.holds[key] = units
+        self.held[task] = calls
 
-    def settle(self, key: str, actual: int):
-        reserved = self.holds.get(key)
-        if (reserved is None or type(actual) is not int
-                or actual < 0 or actual > reserved):
-            raise ValueError("invalid settlement")
-        del self.holds[key]
-        self.spent += actual
+    def settle(self, task: str, actual: int):
+        held = self.held.get(task)
+        if (held is None or type(actual) is not int
+                or actual < 0 or actual > held):
+            raise ValueError("invalid usage")
+        del self.held[task]
+        self.used += actual
 
-ledger = Ledger(10, 2)
-ledger.reserve("logs", 3)
-ledger.reserve("unknown-attempt", 4)
+budget = CallBudget(10, 2)
+budget.reserve("traffic", 3)
+budget.reserve("hotel-running", 4)
 try:
-    ledger.reserve("extra", 2)
+    budget.reserve("extra-research", 2)
 except ValueError:
-    print("exploration blocked")
-ledger.settle("logs", 2)
-ledger.reserve("verify", 2, True)
-print("verification reserved")
-print(f"spent={ledger.spent} held={ledger.held}")
+    print("research stopped")
+budget.settle("traffic", 2)
+budget.reserve("final-check", 2, True)
+print("final check reserved")
+print(f"used={budget.used} held={budget.reserved}")
 ```
 
-真实系统还要防止验收优先权被普通执行者冒用，并把预占/结算持久化。同一进程中无异步间隙的检查，不能替代多进程事务。每次网络尝试也应有自己的记账身份：同一业务动作重试可以复用幂等键，却可能产生新费用。
+真正执行时，助手还要在每次调用前扣自己的份额，不能申请三次却直接调用五次。保护额度的使用权也由运行程序控制，模型不能把普通研究改名“最后核对”就越过限制。多进程服务需要用数据库等方式一起完成检查与分配，重启后记录仍要存在。
 
-费用不能确定上界时，绝对不超支的承诺需要额外条件。Pydantic AI 在请求前和响应后分别检查用量；缺少价格资料时，金额限制无法可靠强制。应用可以先保守估算、限制最大输出，再在响应后结算，但必须说明哪些成本只是估算，不能把事后发现超额称为事前阻止。
+金额比次数更难预先确定。输出长度、提供方计价和请求重试都会影响实际费用。Pydantic AI 在请求前、响应后分别检查用量，缺价格资料时金额限制无法可靠强制。应用可以保守估算并限制最大输出，但应该说明哪些是估算，不能把事后发现超支称为事前阻止。
 
-## 还要给验收与交接留资源
+同一次业务动作重试，也可能多花一次请求成本。日历服务即使识别重复而只保留一条日程，请求本身仍可能产生开销。防重复效果和计算消费，需要两份关联记录。
 
-R42 的最终核对必须保留：15–16 日窗口、16 日业务日期、测试环境与方案版本、产物内容、审批和动作记录。不能把探索预算花光，再让协调者根据草稿宣布成功。已有 `job-42` 未通过验收，后续新测试的完成证据仍要由独立检查取得。
+## 最后几次调用，留给真正有用的检查
 
-小型只读助手可以先用局部轮数和工具计数控制，接线简单。允许并行、重试与跨日恢复之后，根账本才更有价值，代价是预占、结算、未知消费核对与持久化。昂贵写入还应单独限制动作次数，不能折成模型轮数。
+这份旅行草稿至少要检查：周六去、周日回，交通时间与住宿衔接，一晚住宿，加上餐饮和市内交通估算后是否在 1500 元以内，以及没有订票订房。日历还要等用户确认，暂停过就重新确认，创建后再核对一次。
 
-资源不足时，系统停止新工作，保存已完成范围、未决问题、仍在运行的动作和接手位置。它可以交付清楚的未完成结果。最后一章将把这些过程记录与真实产物放到一起，判断 R42 何时才有资格称为完成。
+这些步骤不能等探索花光额度后再决定要不要做。查询候选很多时，可以停止继续找“也许更便宜”的选择，先把已有方案核对清楚。
+
+小型只读助手可以先用局部轮数和请求次数限制，接线少。允许并行、自动重试和跨天继续以后，共享记录更有价值，也增加保存、结算和处理未知消费的工作。
+
+资源不足就交代还缺什么，保存已查到的车次、房间和未决条件，不把未核对的草稿说成完成。最后一章将补齐返程、核算费用，并把用户确认后的日历操作与最终交付放在一起检查。
 
 ## 延伸阅读
 
