@@ -4,9 +4,11 @@ __pycache__/
 *.pyc
 .venv/
 .worktrees/
-website/node_modules/
+website/node_modules
 website/dist/
 website/src/content.json
 website/public/content/
+website/public/manuscript/
+website/public/downloads/
 website/test-results/
 website/playwright-report/

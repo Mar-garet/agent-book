@@ -38,6 +38,20 @@ test('project search and category filters preserve the fixed source snapshot', a
   await expect(page.locator('.project-card')).toHaveCount(8);
 });
 
+test('the public reader serves manuscripts and experiment records without GitHub access', async ({ page }) => {
+  await page.goto('/?read=book%2F14-resume-and-side-effects');
+  const manuscript = page.getByRole('link', { name: '下载本章 Markdown' });
+  await expect(manuscript).toHaveAttribute('href', './manuscript/book/14-resume-and-side-effects.md');
+  const raw = await page.request.get('/manuscript/book/14-resume-and-side-effects.md');
+  expect(raw.ok()).toBe(true);
+  expect(await raw.text()).toContain('# 第十四章');
+  await expect(page.locator('.prose a').filter({ hasText: '原始结果' })).toHaveAttribute('href', './downloads/experiments/results/langgraph-interrupt-replay.json');
+  const results = await page.request.get('/downloads/experiments/results/langgraph-interrupt-replay.json');
+  expect(results.ok()).toBe(true);
+  expect((await results.json()).cases).toHaveLength(4);
+  await expect(page.getByRole('link', { name: '作者 GitHub' })).toHaveAttribute('href', 'https://github.com/Mar-garet');
+});
+
 test('theme and reading size survive a reload and Escape returns search focus', async ({ page }) => {
   await page.goto('/?read=book%2F06-memory');
   await expect(page.locator('.prose')).toContainText('昨天');
@@ -70,7 +84,7 @@ for (const width of [375, 768, 1024, 1440]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto('/');
     await expect(page.locator('.hero-art img')).toBeVisible();
-    expect(await page.locator('.hero-art img').evaluate((image) => image.complete && image.naturalWidth > 0)).toBe(true);
+    await expect.poll(() => page.locator('.hero-art img').evaluate((image) => image.complete && image.naturalWidth > 0)).toBe(true);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     await page.screenshot({ path: `test-results/preview-${width}.png` });
     if (width < 960) {

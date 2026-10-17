@@ -1,4 +1,4 @@
-import { mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises';
+import { copyFile, mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import GithubSlugger from 'github-slugger';
@@ -91,17 +91,34 @@ const projects = manifest.repositories.map((item) => {
   };
 });
 const contentDirectory = join(root, 'website/public/content');
+const manuscriptDirectory = join(root, 'website/public/manuscript');
+const downloadsDirectory = join(root, 'website/public/downloads');
 await rm(contentDirectory, { recursive: true, force: true });
+await rm(manuscriptDirectory, { recursive: true, force: true });
+await rm(downloadsDirectory, { recursive: true, force: true });
 await mkdir(contentDirectory, { recursive: true });
 for (const doc of documents) {
   const destination = join(contentDirectory, `${doc.id}.json`);
   await mkdir(dirname(destination), { recursive: true });
   await writeFile(destination, JSON.stringify({ body: doc.body }));
+  const manuscript = join(manuscriptDirectory, doc.path);
+  await mkdir(dirname(manuscript), { recursive: true });
+  await copyFile(join(root, doc.path), manuscript);
+}
+const attachments = [
+  'SOURCES.json', 'experiments/langgraph_interrupt_replay.py',
+  'experiments/dependencies.lock', 'experiments/results/langgraph-interrupt-replay.json',
+  'scripts/check_book.py',
+];
+for (const file of attachments) {
+  const destination = join(downloadsDirectory, file);
+  await mkdir(dirname(destination), { recursive: true });
+  await copyFile(join(root, file), destination);
 }
 await writeFile(join(contentDirectory, 'search.json'), JSON.stringify(documents.map(
   ({ id, title, displayTitle, kind, text }) => ({ id, title, displayTitle, kind, text }),
 )));
 await writeFile(join(root, 'website/src/content.json'), JSON.stringify({
-  phases, documents: documents.map(({ body, text, ...metadata }) => metadata), projects,
+  phases, documents: documents.map(({ body, text, ...metadata }) => metadata), projects, attachments,
 }));
 console.log(`Reader content: ${phases.flatMap((item) => item.chapters).length} chapters, ${documents.length} documents, ${projects.length} source projects`);

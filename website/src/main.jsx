@@ -12,6 +12,7 @@ import data from './content.json';
 import './styles.css';
 
 const GITHUB = 'https://github.com/Mar-garet/agent_book';
+const AUTHOR = 'https://github.com/Mar-garet';
 const chapters = data.phases.flatMap((phase) => phase.chapters);
 const documents = new Map(data.documents.map((doc) => [doc.id, doc]));
 const FIRST = chapters[0].id;
@@ -45,6 +46,7 @@ function resolveLink(href, doc) {
   const path = decodeURIComponent(resolved.pathname.slice(1));
   const id = path.replace(/\.md$/, '');
   if (documents.has(id)) return hrefFor(id, resolved.hash);
+  if (data.attachments.includes(path)) return `./downloads/${path}${resolved.hash}`;
   const [directory, ...rest] = path.replace(/\/+$/, '').split('/');
   const project = data.projects.find((item) => item.directory === directory);
   if (project) {
@@ -141,7 +143,7 @@ function Home({ lastRead }) {
 }
 
 function Footer() {
-  return <footer className="footer"><span>思想是主线，项目是案例，源码是证据。</span><a href={GITHUB} target="_blank" rel="noreferrer">在 GitHub 阅读<Icon icon={ArrowUpRight} size={14} /></a></footer>;
+  return <footer className="footer"><span>思想是主线，项目是案例，源码是证据。</span><a href={AUTHOR} target="_blank" rel="noreferrer">Mar-garet<Icon icon={ArrowUpRight} size={14} /></a></footer>;
 }
 
 function Contents({ visited }) {
@@ -280,7 +282,7 @@ function Reader({ doc, theme, fontSize, setFontSize }) {
         <div className="prose">{body.text !== undefined ? markdown
           : body.error ? <div className="chapter-load-error" role="alert"><p>本章暂未加载成功。</p><button className="button secondary" onClick={() => setLoadAttempt((attempt) => attempt + 1)}>重新加载</button></div>
             : <div className="chapter-skeleton" role="status" aria-label="正在加载正文"><span /><span /><span /><span /></div>}</div>
-        <div className="article-source"><a href={`${GITHUB}/blob/main/${doc.path}`} target="_blank" rel="noreferrer"><Icon icon={GithubLogo} size={17} />查看本章 Markdown<Icon icon={ArrowUpRight} size={15} /></a></div>
+        <div className="article-source"><a href={`./manuscript/${doc.path}`} download={doc.path.split('/').pop()}><Icon icon={FileText} size={17} />下载本章 Markdown<Icon icon={ArrowDown} size={15} /></a></div>
         {chapterIndex >= 0 && <nav className="chapter-pagination" aria-label="前后章节">
           {previous ? <a href={hrefFor(previous.id)}><span><Icon icon={ArrowLeft} size={16} />上一章</span><strong>{previous.title}</strong></a> : <a href="?page=contents"><span><Icon icon={Books} size={16} />阅读路线</span><strong>全书目录</strong></a>}
           {next ? <a href={hrefFor(next.id)} className="next-chapter"><span>下一章<Icon icon={ArrowRight} size={16} /></span><strong>{next.title}</strong></a> : <a href={hrefFor('references/studies/README')} className="next-chapter"><span>继续探索<Icon icon={ArrowRight} size={16} /></span><strong>源码研究与证据</strong></a>}
@@ -401,7 +403,7 @@ function App() {
     <header className="site-header">
       <div className="header-brand"><button className="icon-button mobile-menu-button" aria-label="打开章节目录" aria-expanded={menuOpen} onClick={() => setMenuOpen(true)}><Icon icon={List} size={23} /></button><a className="brand" href={location.pathname}><span className="brand-mark"><Icon icon={BookOpen} size={22} /></span><span>Agent Book<span className="brand-period">.</span></span></a></div>
       <nav className="top-nav" aria-label="主导航"><a href="?page=contents" aria-current={route.page === 'contents' && !route.read ? 'page' : undefined}>全书目录</a><a href="?page=projects" aria-current={route.page === 'projects' && !route.read ? 'page' : undefined}>项目地图</a></nav>
-      <div className="header-actions"><button className="search-trigger" onClick={() => { setMenuOpen(false); setSearchOpen(true); }} aria-label="搜索全书"><Icon icon={MagnifyingGlass} size={18} /><span>搜索全书</span><kbd>⌘ K</kbd></button><button className="icon-button theme-toggle" aria-label={`当前${themeLabel}模式，点击切换主题`} title={`当前${themeLabel}模式`} onClick={() => setThemePreference((value) => value === 'system' ? 'light' : value === 'light' ? 'dark' : 'system')}><Icon icon={themeIcon} /></button><a className="icon-button github-link" href={GITHUB} aria-label="GitHub 仓库" target="_blank" rel="noreferrer"><Icon icon={GithubLogo} size={23} /></a></div>
+      <div className="header-actions"><button className="search-trigger" onClick={() => { setMenuOpen(false); setSearchOpen(true); }} aria-label="搜索全书"><Icon icon={MagnifyingGlass} size={18} /><span>搜索全书</span><kbd>⌘ K</kbd></button><button className="icon-button theme-toggle" aria-label={`当前${themeLabel}模式，点击切换主题`} title={`当前${themeLabel}模式`} onClick={() => setThemePreference((value) => value === 'system' ? 'light' : value === 'light' ? 'dark' : 'system')}><Icon icon={themeIcon} /></button><a className="icon-button github-link" href={AUTHOR} aria-label="作者 GitHub" target="_blank" rel="noreferrer"><Icon icon={GithubLogo} size={23} /></a></div>
     </header>
     <aside className="sidebar"><Sidebar current={route.read} lastRead={lastRead} /></aside>
     <div className="main-shell">

@@ -8,7 +8,7 @@
 
 [![Agent Book 阅读界面：纸白排版、章节目录与封面插图](docs/assets/reader-desktop.webp)](website/README.md)
 
-[打开阅读界面](website/README.md) · [从开篇开始阅读](book/00-do-you-really-understand-agents.md) · [全书目录](book/README.md) · [开源项目地图](book/10-project-comparisons.md) · [32 个源码仓库](docs/source-catalog.md)
+[在线阅读](https://agent-book-mar-garet.ivorytoast129.chatgpt.site/) · [本地启动](website/README.md) · [从开篇开始阅读](book/00-do-you-really-understand-agents.md) · [全书目录](book/README.md) · [开源项目地图](book/10-project-comparisons.md) · [32 个源码仓库](docs/source-catalog.md)
 
 阅读界面提供全文搜索、章节导航、项目筛选、深浅主题和字号调节。正文仍在本仓库的 Markdown 中维护。启动方式与界面预览见 [阅读界面说明](website/README.md)。
 
