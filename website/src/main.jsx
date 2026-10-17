@@ -81,7 +81,7 @@ function Sidebar({ current, lastRead, onNavigate }) {
           className={current === chapter.id ? 'chapter-link current' : 'chapter-link'}
           aria-current={current === chapter.id ? 'page' : undefined} onClick={onNavigate}>
           <span className="chapter-number" aria-hidden={phase.kind === 'topic' ? true : undefined}>{phase.kind === 'topic' ? '·' : String(chapter.number).padStart(2, '0')}</span>
-          <span>{chapter.title.replace(/：.+$/, '')}</span>
+          <span>{phase.kind === 'topic' ? chapter.title : chapter.title.replace(/：.+$/, '')}</span>
         </a>)}
       </section>)}
     </nav>
@@ -123,12 +123,23 @@ function Home({ lastRead }) {
     </section>
 
     <section className="routes-section">
-      <div className="section-heading"><h2>顺着问题，读下去</h2><p>基础篇建立共同语言，专题篇围绕系统能力深入。</p></div>
+      <div className="section-heading"><h2>先建立共同语言</h2><p>沿一个逐渐复杂的任务，理解 Agent 怎样持续行动。</p></div>
       <div className="reading-routes">
-        {data.phases.map((phase, index) => <a href={`?page=contents#phase-${index}`} className="reading-route" key={phase.title}>
+        {data.phases.filter((phase) => phase.kind === 'foundation').map((phase, index) => <a href={`?page=contents#phase-${index}`} className="reading-route" key={phase.title}>
           <span className="route-index">{String(index + 1).padStart(2, '0')}</span>
-          <div><h3>{phase.title}</h3><p>{phase.kind === 'topic' ? '系统专题' : '基础阶段'} · {phase.chapters.length} 篇</p></div>
+          <div><h3>{phase.title}</h3><p>{phase.chapters.length} 篇基础章节</p></div>
           <Icon icon={ArrowUpRight} size={19} />
+        </a>)}
+      </div>
+    </section>
+
+    <section className="system-topics-section" aria-labelledby="system-topics-title">
+      <div className="section-heading"><h2 id="system-topics-title">再把一个系统讲透</h2><p>比较不同实现，沿调用链理解机制，再回到自己的设计。</p></div>
+      <div className="system-topic-grid">
+        {data.phases.filter((phase) => phase.kind === 'topic').map((phase, index) => <a className="system-topic-card" key={phase.title} href={hrefFor(phase.chapters[0].id)}>
+          <span className="topic-card-index">专题 {String(index + 1).padStart(2, '0')}</span>
+          <h3>{phase.title}</h3><p>{phase.description}</p>
+          <span className="topic-card-link">进入专题<Icon icon={ArrowRight} size={18} /></span>
         </a>)}
       </div>
     </section>
@@ -151,6 +162,7 @@ function Footer() {
 function Contents({ visited }) {
   return <main className="contents-page page-content" id="main-content" tabIndex={-1}>
     <header className="page-heading"><p className="eyebrow">全书目录</p><h1>从零，到设计深处。</h1><p>先循序渐进地建立概念，再按记忆、上下文、工具、协作与可靠执行深入。</p></header>
+    <nav className="topic-jump-links" aria-label="系统专题快捷跳转">{data.phases.map((phase, index) => phase.kind === 'topic' && <a key={phase.title} href={`#phase-${index}`}>{phase.title}<Icon icon={ArrowDown} size={14} /></a>)}</nav>
     {data.phases.map((phase, index) => <React.Fragment key={phase.title}>
       {(index === 0 || phase.kind !== data.phases[index - 1].kind) && <div className="contents-part"><span className="small-label">{phase.kind === 'topic' ? 'PART II' : 'PART I'}</span><h2>{phase.kind === 'topic' ? '专题篇 · 比较实现，理解系统设计' : '基础篇 · 从零建立共同语言'}</h2><p>{phase.kind === 'topic' ? '从同一组问题出发，比较不同项目的选择，再沿机制、取舍与失败方式深入。' : '沿一个逐渐复杂的任务，理解 Agent 的参与者、执行过程与基本能力。'}</p></div>}
       <section className="contents-phase" id={`phase-${index}`}>
@@ -200,14 +212,33 @@ function MermaidDiagram({ code, theme }) {
   useEffect(() => {
     let cancelled = false;
     import('mermaid').then(async ({ default: mermaid }) => {
-      mermaid.initialize({ startOnLoad: false, securityLevel: 'strict', theme: theme === 'dark' ? 'dark' : 'neutral', suppressErrorRendering: true, fontFamily: 'system-ui, sans-serif' });
+      const palette = getComputedStyle(document.documentElement);
+      const color = (name) => palette.getPropertyValue(name).trim();
+      const ink = color('--ink');
+      const paper = color('--paper');
+      const surface = color('--feature');
+      const line = color('--secondary');
+      mermaid.initialize({
+        startOnLoad: false, securityLevel: 'strict', theme: 'base', suppressErrorRendering: true,
+        fontFamily: 'system-ui, sans-serif',
+        themeVariables: {
+          darkMode: theme === 'dark', useGradient: false,
+          background: paper, primaryColor: surface, secondaryColor: paper, tertiaryColor: surface,
+          primaryTextColor: ink, secondaryTextColor: ink, tertiaryTextColor: ink, textColor: ink,
+          primaryBorderColor: line, secondaryBorderColor: line, tertiaryBorderColor: line,
+          lineColor: line, edgeLabelBackground: paper, titleColor: ink,
+          stateBkg: surface, stateLabelColor: ink, labelBackgroundColor: paper,
+          noteBkgColor: surface, noteTextColor: ink, noteBorderColor: line,
+        },
+      });
       const { svg } = await mermaid.render(`diagram${id}`, code);
       if (!cancelled) setResult({ code, svg, error: false });
     }).catch(() => { if (!cancelled) setResult({ code, svg: '', error: true }); });
     return () => { cancelled = true; };
   }, [code, theme, id]);
   const title = code.match(/^%%\s+(.+)/)?.[1] || '执行过程与责任流转';
-  return <figure className={expanded ? 'diagram diagram-expanded' : 'diagram'}>
+  const naturalWidth = Number(result.svg.match(/viewBox="[^"]*? ([\d.]+) [\d.]+"/)?.[1]) || 680;
+  return <figure className={expanded ? 'diagram diagram-expanded' : 'diagram'} style={{ '--diagram-width': `${Math.max(680, naturalWidth)}px` }}>
     <figcaption><span>图解</span>{title}</figcaption>
     <div className="diagram-controls"><span>{expanded ? '可左右滚动查看细节' : '可放大查看细节'}</span><button type="button" aria-pressed={expanded} onClick={() => setExpanded(!expanded)}>{expanded ? '适应宽度' : '放大图表'}</button></div>
     {result.code === code && result.svg ? <div className="diagram-image" tabIndex={0} role="img" aria-label={title} dangerouslySetInnerHTML={{ __html: result.svg }} />
@@ -289,6 +320,7 @@ function Reader({ doc, theme, fontSize, setFontSize }) {
           <h1>{doc.displayTitle}</h1>
           <div className="article-tools"><span>对照源码，理解设计取舍。</span><div className="font-controls" role="group" aria-label="正文字号"><Icon icon={TextAa} size={18} /><button disabled={fontSize <= 16} onClick={() => setFontSize(fontSize - 1)} aria-label="减小字号">小</button><button disabled={fontSize >= 23} onClick={() => setFontSize(fontSize + 1)} aria-label="增大字号">大</button></div></div>
         </header>
+        {phase?.kind === 'topic' && phase.chapters.length > 1 && <details className="topic-reading-list"><summary>本专题的 {phase.chapters.length} 篇文章</summary><nav aria-label="本专题文章">{phase.chapters.map((chapter) => <a key={chapter.id} href={hrefFor(chapter.id)} aria-current={doc.id === chapter.id ? 'page' : undefined}>{chapter.title}</a>)}</nav></details>}
         <div className="prose">{body.text !== undefined ? markdown
           : body.error ? <div className="chapter-load-error" role="alert"><p>本章暂未加载成功。</p><button className="button secondary" onClick={() => setLoadAttempt((attempt) => attempt + 1)}>重新加载</button></div>
             : <div className="chapter-skeleton" role="status" aria-label="正在加载正文"><span /><span /><span /><span /></div>}</div>

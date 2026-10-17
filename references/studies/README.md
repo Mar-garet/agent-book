@@ -6,23 +6,25 @@
 
 ## 动作、状态与工具
 
-- [Pi 与 Deep Agents 的执行过程](pi-deepagents-execution.md)：一批工具怎样准备、执行和反馈，默认能力怎样装配，子任务继承哪些状态。对应 [第十二章](../../book/12-action-boundaries.md) 与 [第十三章](../../book/13-context-and-defaults.md)。
-- [Codex 的工具执行](codex-tool-execution.md)：命令与 MCP 两类路径上的策略、审批、隔离、重试与结果。对应 [第十二章](../../book/12-action-boundaries.md)。
-- [LangGraph 的中断与恢复](langgraph-interrupt-resume.md)：节点重入、检查点和外部动作为什么可能不同步。对应 [第十四章](../../book/14-resume-and-side-effects.md)，附四个实际运行场景。
-- [工具结果、异常与批次重试](tool-results-and-retries.md)：谁把异常改成消息，谁重试整个节点，已经成功的动作为什么也会重做。对应 [第十七章](../../book/17-tool-results-and-retries.md)。
+- [Pi 与 Deep Agents 的执行过程](pi-deepagents-execution.md)：一批工具怎样准备、执行和反馈，默认能力怎样装配，子任务继承哪些状态。对应 [可靠执行系统](../../book/12-action-boundaries.md) 与 [上下文系统](../../book/13-context-and-defaults.md)。
+- [Codex 的工具执行](codex-tool-execution.md)：命令与 MCP 两类路径上的策略、审批、隔离、重试与结果。对应 [可靠执行系统](../../book/12-action-boundaries.md)。
+- [LangGraph 的中断与恢复](langgraph-interrupt-resume.md)：节点重入、检查点和外部动作为什么可能不同步。对应 [执行恢复专题](../../book/14-resume-and-side-effects.md)，附四个实际运行场景。
+- [工具结果、异常与批次重试](tool-results-and-retries.md)：谁把异常改成消息，谁重试整个节点，已经成功的动作为什么也会重做。对应 [工具结果与重试](../../book/17-tool-results-and-retries.md)。
 
 ## 上下文、记忆与信任
 
-- [Hermes 与 OpenClaw 的记忆更新](openclaw-hermes-memory.md)：持久文件、运行缓存、索引与实际请求怎样衔接。对应 [第十五章](../../book/15-memory-update-boundaries.md)。
-- [Goose 与 Cline SDK 的 MCP 宿主](goose-cline-mcp.md)：工具发现、身份、目录更新、审批与输出处理。对应 [第十六章](../../book/16-mcp-host-differences.md)。
-- [Pi 与 Hermes 的上下文压缩](context-compaction.md)：切点、摘要输入、原始记录与刷新边界，附 Pi 真实序列化函数的本地观察。对应 [第十八章](../../book/18-context-compaction.md)。
-- [工具内容与信任边界](trust-and-tool-content.md)：MCP 注解、Codex 目录快照和 Cline 临时结果缓存各自保证什么。对应 [第二十章](../../book/20-trust-boundaries.md)。
+- [上下文系统补充](context-system-design.md)：Deep Agents 结果外置的写入条件、失败回退与 Codex 模型输出表示，支持上下文系统主章的设计比较。
+
+- [Hermes 与 OpenClaw 的记忆更新](openclaw-hermes-memory.md)：持久文件、运行缓存、索引与实际请求怎样衔接。对应 [记忆系统](../../book/15-memory-update-boundaries.md)。
+- [Goose 与 Cline SDK 的 MCP 宿主](goose-cline-mcp.md)：工具发现、身份、目录更新、审批与输出处理。对应 [工具与 MCP 系统](../../book/16-mcp-host-differences.md)。
+- [Pi 与 Hermes 的上下文压缩](context-compaction.md)：切点、摘要输入、原始记录与刷新边界，附 Pi 真实序列化函数的本地观察。对应 [上下文压缩](../../book/18-context-compaction.md)。
+- [工具内容与信任边界](trust-and-tool-content.md)：MCP 注解、Codex 目录快照和 Cline 临时结果缓存各自保证什么。对应 [信任边界](../../book/20-trust-boundaries.md)。
 
 ## 分工、预算与验收
 
-- [委派与交接](delegation-and-handoffs.md)：OpenAI Agents SDK 与 Deep Agents 怎样转移控制、传递输入并返回结果。对应 [第十九章](../../book/19-delegation-and-handoffs.md)。
-- [执行预算](execution-budgets.md)：SDK 轮数、子运行、提供方重试、图步数与并发上限分别在哪里计数。对应 [第二十一章](../../book/21-execution-budgets.md)。
-- [任务验收与评测](evaluation-and-evidence.md)：原始 SWE-bench 与 τ-bench 怎样判断完成，结果检查与过程要求为什么需要分别考虑。对应 [第二十二章](../../book/22-evaluation-and-completion.md)。
+- [委派与交接](delegation-and-handoffs.md)：OpenAI Agents SDK 与 Deep Agents 怎样转移控制、传递输入并返回结果。对应 [协作系统](../../book/19-delegation-and-handoffs.md)。
+- [执行预算](execution-budgets.md)：SDK 轮数、子运行、提供方重试、图步数与并发上限分别在哪里计数。对应 [执行预算](../../book/21-execution-budgets.md)。
+- [任务验收与评测](evaluation-and-evidence.md)：原始 SWE-bench 与 τ-bench 怎样判断完成，结果检查与过程要求为什么需要分别考虑。对应 [评测系统](../../book/22-evaluation-and-completion.md)。
 
 ## 哪些已经运行
 

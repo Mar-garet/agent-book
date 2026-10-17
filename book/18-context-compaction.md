@@ -1,6 +1,6 @@
-# 摘要更短了，Agent 为什么反而忘了关键事实？
+# 上下文压缩：信息怎样在交接处丢失
 
-本章主线统计一个由宿主主动调用的会话压缩入口；自动触发属于会话内部的另一条调用路径。对照案例另统计一个本地压缩协调入口。这里数的是协调一次压缩的入口，准备数据、摘要生成器与存储组件不另计。
+本章统计两个协调压缩的真实入口：Pi 中由宿主主动调用的会话压缩入口，以及 Hermes 的本地压缩协调入口。Pi 自动触发属于会话内部另一条调用路径；Deep Agents 只比较摘要工厂配置，不另数为压缩执行入口。准备数据、摘要生成器与存储组件不另计。
 
 报表助手读完一段很长的日志，根因出现在末尾。用户又补充了一句：“只处理测试环境。”随后，界面提示上下文已经压缩。
 
@@ -17,6 +17,7 @@
 当事实消失时，需要沿这条链逐段定位：它是否被记录，是否入选摘要材料，是否出现在摘要里，最后是否进入实际请求。只比较压缩前后的总长度，看不到这些差别。
 
 ```mermaid
+%% 图 1：信息需要依次穿过选择、摘要和请求重建
 flowchart LR
     A[原始会话记录] --> B[选择与预处理]
     B --> C[交给摘要模型的材料]
@@ -28,6 +29,22 @@ flowchart LR
 ```
 
 图中最后一条虚线需要单独实现。保存了原文，不会让它自动回到下一轮输入。
+
+## 先比较压缩承担了哪些职责
+
+主章比较了整个上下文系统，这里把镜头收窄到同一情境：历史已接近预算，助手仍要保住“只处理测试环境”和错误出处。Pi、Hermes 与 Deep Agents 都提供压缩相关机制，但默认配置和协调范围不同。下面比较程序的职责，没有把三个项目配置成同一模型后运行排障。
+
+| 同一问题 | Pi 默认编程会话路径 | Hermes 本地协调路径 | Deep Agents 默认摘要工厂 |
+| --- | --- | --- | --- |
+| 谁决定何时整理历史 | 会话依据预算自动判断，也允许宿主主动压缩 | 协调器综合输入预算、输出预留及运行限制 | 工厂按模型 profile 配置触发与保留阈值 |
+| 谁决定摘要器能读什么 | 准备组件选择历史，序列化器进一步处理消息 | 内容引擎处理协调器交给它的上下文 | 摘要中间层参与消息处理，不能仅从工厂阈值推断全部材料选择 |
+| 压缩是否可能改变规则来源 | 本文不据历史压缩推导规则文件必然刷新 | 所考察在线路径还可能刷新系统前缀、记忆和工具说明 | memory 有独立缓存语义，不能把摘要触发当作刷新保证 |
+| 哪项证据已经运行 | 人工工具结果的摘要材料裁剪检查 | 本文仅源码阅读 | 本文仅源码阅读 |
+
+Pi 与 Hermes 的依据见本章对应源码注释。Deep Agents 工厂在有模型输入上限时配置占比触发和保留目标，没有该信息时回退到固定阈值；其具体默认值与范围见[本地装配研究](../references/studies/pi-deepagents-execution.md)及[固定源码](https://github.com/langchain-ai/deepagents/blob/e80fd67dfaf5ef19f11a64c5d039f18b8b0c7b27/libs/deepagents/deepagents/middleware/summarization.py#L265-L300)。这张表提示一个取舍：默认工厂能减少应用接线，但模型资料是否完整、规则缓存是否新鲜，仍需要分别检查。
+
+> [!NOTE]
+> 压缩阈值只是开始整理的条件。它没有说明错误日志尾部会不会进入摘要材料，也没有说明用户限制会不会原样保留。
 
 ## Pi 先保持执行结构，再缩短历史
 
@@ -94,7 +111,32 @@ Hermes 的对照范围是一个本地压缩协调入口 `compress_context(...)`�
 
 因此，观察位置应该落在状态变化上：选中了哪些条目，生成了什么候选摘要，是否追加了压缩记录，最终请求采用了哪个边界。用户看见的提示是过程的一部分，不是全部过程。
 
-经过压缩，一个 Agent 需要保住的是继续做事所需的依据。[协作系统专题](19-delegation-and-handoffs.md)把这个问题向外推进：这些依据如果要交给另一个 Agent，谁决定传什么，谁还负责最后的交付？
+## 自己设计时，把摘要生成与状态提交分开
+
+以下是一种应用设计，不是这些项目共同具备的事务保证。可以先在旧上下文上构造候选摘要，并保留它所覆盖的条目范围；检查通过后，再把摘要、范围与版本一起提交。后续请求只读取已提交版本。这样，候选生成失败时仍能使用旧投影；提交成功后界面通知失败，也能从持久状态判断实际采用了哪一版。
+
+```mermaid
+%% 图 2：建议的压缩提交过程，让失败后仍能判断采用哪一版
+stateDiagram-v2
+    [*] --> 旧投影可用
+    旧投影可用 --> 生成候选: 记录源范围与版本
+    生成候选 --> 旧投影可用: 生成失败或检查拒绝
+    生成候选 --> 检查候选: 摘要与证据定位齐备
+    检查候选 --> 旧投影可用: 约束或结构不完整
+    检查候选 --> 新投影已提交: 提交摘要及边界
+    新投影已提交 --> 请求使用新投影
+```
+
+图 2 的检查可以确认约束字段、消息关联和证据引用是否存在，却不能仅靠字段齐全证明摘要忠实。用户说“暂时不能改生产”，候选摘要写成“之后修改生产”，即使结构完全合法，含义仍然错了。高风险约束适合由应用保留原始状态和执行检查；摘要负责帮助模型理解，不能独自改变允许动作。
+
+对报表任务，比较有用的候选摘要应说明：仍在测试环境取证，已确认哪个错误，哪个根因仍是假设，日志保存在什么位置，还有哪次查询没完成。它比“已经进行了多轮排障”更长一些，却为下一步节省了重新猜测与重复查询。
+
+验证候选时，也要覆盖连续压缩。第一次遗漏的否定词可能在第二次成为既定事实；第一次正确保存的文件位置，也可能在重启后失效。因此可以追踪约束保留、事实出处可读、假设是否被误写成结论，以及未完成动作是否被误写成成功。这里给出的是验证目标，未声称本书已经跑完这些任务实验。
+
+> [!IMPORTANT]
+> 摘要更短只说明表示变小。持续约束仍然有效、证据能够回查、执行状态没有被改写，才说明任务有条件继续。
+
+经过压缩，Agent 需要保住继续做事的依据。下一章转向取得新依据与执行动作的工具系统：模型能够看到一个工具之后，运行系统还要怎样处理参数、权限、结果和失败？等这些责任清楚了，我们再在协作专题中讨论如何把任务交给另一个 Agent。
 
 [^entry]: [本地主动入口](../pi/packages/coding-agent/src/core/agent-session.ts#L2779-L2810) · [固定源码](https://github.com/earendil-works/pi/blob/8efd314fa3d3232ce197d8d7a6a5660530b9d83e/packages/coding-agent/src/core/agent-session.ts#L2779-L2810)；[扩展与提交顺序](https://github.com/earendil-works/pi/blob/8efd314fa3d3232ce197d8d7a6a5660530b9d83e/packages/coding-agent/src/core/agent-session.ts#L2807-L2880)。
 [^selection]: [本地压缩准备](../pi/packages/coding-agent/src/core/compaction/compaction.ts) · [完整研究与切点分析](../references/studies/context-compaction.md)；[默认预算与触发](https://github.com/earendil-works/pi/blob/8efd314fa3d3232ce197d8d7a6a5660530b9d83e/packages/coding-agent/src/core/compaction/compaction.ts#L120-L130)。
@@ -105,4 +147,4 @@ Hermes 的对照范围是一个本地压缩协调入口 `compress_context(...)`�
 [^refresh]: [本地前缀刷新](../hermes-agent/agent/conversation_compression.py#L3081-L3125) · [固定源码](https://github.com/NousResearch/hermes-agent/blob/e31c674f7c523070f48f3baad0650c2fdd7ef6e5/agent/conversation_compression.py#L3081-L3125)；[提交前调用](https://github.com/NousResearch/hermes-agent/blob/e31c674f7c523070f48f3baad0650c2fdd7ef6e5/agent/conversation_compression.py#L4252-L4265)。
 [^commit]: [本地追加与刷新](../pi/packages/coding-agent/src/core/agent-session.ts#L2845-L2880) · [固定源码](https://github.com/earendil-works/pi/blob/8efd314fa3d3232ce197d8d7a6a5660530b9d83e/packages/coding-agent/src/core/agent-session.ts#L2845-L2880)；适用条件见 [压缩研究](../references/studies/context-compaction.md)。
 
-[上一章：默认能力，是怎样被装配出来的？](13-context-and-defaults.md) · [下一章：同一个 MCP 服务，为什么进入两个 Agent 后表现不同？](16-mcp-host-differences.md)
+[上一章：上下文系统：让下一步判断拿到合适的依据](13-context-and-defaults.md) · [下一章：工具与 MCP 系统：怎样让 Agent 可靠地接触外部世界？](16-mcp-host-differences.md)

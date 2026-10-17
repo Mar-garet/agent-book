@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
@@ -69,14 +70,14 @@ test('later chapters remain connected and all experiment attachments are public'
   await page.goto('/?read=book%2F16-mcp-host-differences');
   await page.locator('.next-chapter').click();
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('工具返回了，任务为什么还没有完成？');
-  await expect(page.locator('.diagram-image svg')).toBeVisible();
-  for (const title of ['叫来更多 Agent，为什么还要有人收尾？', '用户说了停，动作为什么还在发生？']) {
+  await expect(page.locator('.diagram-image svg').first()).toBeVisible();
+  for (const title of ['协作系统：更多 Agent，怎样共同交付一份结果？', '可靠执行系统：让动作可控、过程可恢复、结果可核查']) {
     await page.locator('.next-chapter').click();
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(title);
     await expect(page.locator('.prose h2').first()).toBeVisible();
   }
   await page.goto('/?read=book%2F22-evaluation-and-completion');
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('谁来证明 Agent 真的完成了？');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('评测系统：让任务完成成为可复核的结论');
   await expect(page.locator('.prose a').filter({ hasText: '离线验收记录' })).toHaveAttribute('href', './downloads/experiments/results/task-acceptance.json');
   const manifestResponse = await page.request.get('/downloads/experiments/manifest.json');
   expect(manifestResponse.ok()).toBe(true);
@@ -115,7 +116,7 @@ test('theme and reading size survive a reload and Escape returns search focus', 
 
 test('MCP diagrams render and an upstream directory link stays on its pinned commit', async ({ page }) => {
   await page.goto('/?read=book%2F04-mcp');
-  await expect(page.locator('.diagram-image svg')).toBeVisible();
+  await expect(page.locator('.diagram-image svg').first()).toBeVisible();
   await page.goto('/?read=book%2F10-project-comparisons');
   const source = page.locator('.prose a').filter({ hasText: 'Codex CLI' });
   await expect(source).toHaveAttribute('href', 'https://github.com/openai/codex/tree/5009a99dfc07830ddf7464c26f310a2b8532b55d');
@@ -152,7 +153,7 @@ test('home and reader pass automated accessibility checks in light and dark them
     expect(home.violations.map(({ id, nodes }) => ({ id, targets: nodes.map((node) => node.target) }))).toEqual([]);
     await page.screenshot({ path: `test-results/home-${theme}.png` });
     await page.goto('/?read=book%2F14-resume-and-side-effects');
-    await expect(page.locator('.diagram-image svg')).toBeVisible();
+    await expect(page.locator('.diagram-image svg').first()).toBeVisible();
     const reader = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze();
     expect(reader.violations.map(({ id, nodes }) => ({ id, targets: nodes.map((node) => node.target) }))).toEqual([]);
     await page.screenshot({ path: `test-results/reader-${theme}.png` });
@@ -172,9 +173,9 @@ test('contents separates foundations and system topics without losing or duplica
   await expect(page.locator('.article-meta')).toContainText('系统专题');
   await expect(page.locator('.article-meta')).not.toContainText('第 15 章');
   await page.locator('.next-chapter').click();
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('默认能力，是怎样被装配出来的？');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('上下文系统：让下一步判断拿到合适的依据');
   await page.locator('.next-chapter').click();
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('摘要更短了，Agent 为什么反而忘了关键事实？');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('上下文压缩：信息怎样在交接处丢失');
 });
 
 for (const width of [375, 1440]) {
@@ -201,7 +202,57 @@ for (const width of [375, 1440]) {
       const diagram = page.locator('.diagram').first();
       await diagram.getByRole('button', { name: '放大图表' }).click();
       await expect(diagram.getByRole('button', { name: '适应宽度' })).toHaveAttribute('aria-pressed', 'true');
+      expect(await diagram.locator('svg').evaluate((svg) => svg.getBoundingClientRect().width >= Math.min(680, svg.viewBox.baseVal.width))).toBe(true);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     });
   }
+}
+
+
+test('home topic cards and contents shortcuts lead to the complete system articles', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('.system-topic-card')).toHaveCount(5);
+  await page.locator('.system-topic-card').filter({ hasText: '协作系统' }).click();
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('协作系统：');
+  await page.goto('/?page=contents');
+  const shortcuts = page.getByRole('navigation', { name: '系统专题快捷跳转' });
+  await expect(shortcuts.getByRole('link')).toHaveCount(5);
+  await shortcuts.getByRole('link', { name: '工具与 MCP 系统' }).click();
+  await expect(page.locator('#phase-6 h2')).toBeInViewport();
+  await page.locator('#phase-6 .contents-chapter').first().click();
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('工具与 MCP 系统：');
+  await page.locator('.topic-reading-list summary').click();
+  await page.getByRole('navigation', { name: '本专题文章' }).getByRole('link').last().click();
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('工具返回了，任务为什么还没有完成？');
+});
+
+const systemArticles = [
+  '12-action-boundaries', '13-context-and-defaults', '14-resume-and-side-effects',
+  '16-mcp-host-differences', '17-tool-results-and-retries', '18-context-compaction',
+  '19-delegation-and-handoffs', '20-trust-boundaries', '21-execution-budgets', '22-evaluation-and-completion',
+].map((id) => {
+  const source = readFileSync(new URL(`../../book/${id}.md`, import.meta.url), 'utf8');
+  return { id, title: source.split('\n')[0].replace(/^# /, ''), diagrams: (source.match(/^```mermaid/gm) || []).length };
+});
+
+for (const [width, theme] of [[375, 'dark'], [1440, 'light']]) {
+  test(`all system articles render their diagrams and prose at ${width}px in ${theme}`, async ({ page }) => {
+    test.setTimeout(120000);
+    await page.setViewportSize({ width, height: 1000 });
+    await page.goto('/');
+    await page.evaluate((value) => localStorage.setItem('agent-book-theme', JSON.stringify(value)), theme);
+    for (const article of systemArticles) {
+      await page.goto(`/?read=${encodeURIComponent(`book/${article.id}`)}`);
+      await expect(page.getByRole('heading', { level: 1 })).toHaveText(article.title);
+      await expect(page.locator('.diagram-image svg')).toHaveCount(article.diagrams);
+      await expect(page.locator('.diagram-status')).toHaveCount(0);
+      await expect(page.locator('.prose')).not.toContainText(/\[!(NOTE|TIP|WARNING|IMPORTANT)\]/);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+      const findings = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze();
+      expect(findings.violations.map(({ id, nodes }) => ({ id, targets: nodes.map((node) => node.target) }))).toEqual([]);
+      if (['13-context-and-defaults', '16-mcp-host-differences', '19-delegation-and-handoffs', '12-action-boundaries', '22-evaluation-and-completion'].includes(article.id)) {
+        await page.screenshot({ path: `test-results/system-${article.id}-${width}-${theme}.png` });
+      }
+    }
+  });
 }

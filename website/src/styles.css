@@ -439,4 +439,33 @@ dialog::backdrop { background: rgb(28 30 24 / .34); backdrop-filter: blur(3px); 
 .diagram-controls { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: -12px 0 16px; color: var(--secondary); font-size: 12px; }
 .diagram-controls button { min-height: 44px; padding: 8px 12px; background: var(--surface); border: 1px solid var(--line); }
 .diagram-controls button:hover { border-color: var(--accent); color: var(--accent); }
-.diagram-expanded .diagram-image svg { min-width: 680px; }
+.diagram-expanded .diagram-image svg { min-width: var(--diagram-width, 680px); }
+
+.system-topics-section { padding: 48px 0; border-top: 1px solid var(--line); }
+.system-topic-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 16px; }
+.system-topic-card { grid-column: span 2; display: flex; flex-direction: column; border: 1px solid var(--line); border-top: 3px solid var(--accent); border-radius: 0 0 8px 8px; padding: 24px; background: var(--surface); }
+.system-topic-card:nth-child(-n+2) { grid-column: span 3; }
+.system-topic-card:hover { border-color: var(--accent); background: var(--feature); }
+.topic-card-index { color: var(--accent); font-size: 12px; }
+.system-topic-card h3 { margin: 16px 0 12px; font: 500 25px/1.5 'Songti SC', 'STSong', serif; }
+.system-topic-card p { margin: 0 0 24px; color: var(--secondary); font-size: 14px; line-height: 1.85; }
+.topic-card-link { display: flex; align-items: center; justify-content: space-between; margin-top: auto; color: var(--accent); font-size: 13px; min-height: 28px; }
+.topic-jump-links { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 12px; }
+.topic-jump-links a { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 8px 14px; border: 1px solid var(--line); border-radius: 5px; font-size: 13px; color: var(--secondary); }
+.topic-jump-links a:hover { color: var(--accent); border-color: var(--accent); }
+.topic-reading-list { margin: 0 0 32px; padding: 12px 18px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); font-size: 13px; color: var(--secondary); }
+.topic-reading-list summary { cursor: pointer; min-height: 44px; display: list-item; align-content: center; }
+.topic-reading-list nav { display: flex; flex-direction: column; padding: 8px 0; }
+.topic-reading-list a { padding: 12px 0; line-height: 1.7; }
+.topic-reading-list a[aria-current='page'] { color: var(--accent); font-weight: 600; }
+@media (max-width: 1100px) {
+  .system-topic-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .system-topic-card, .system-topic-card:nth-child(-n+2) { grid-column: auto; }
+  .system-topic-card:last-child { grid-column: 1 / -1; }
+}
+@media (max-width: 600px) {
+  .system-topics-section { padding: 32px 0; }
+  .system-topic-grid { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .system-topic-card { padding: 20px; }
+  .system-topic-card h3 { font-size: 23px; }
+}

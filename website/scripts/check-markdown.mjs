@@ -22,7 +22,10 @@ async function files(directory) {
 
 const paths = (await Promise.all(['book', 'docs', 'references'].map(
   (directory) => files(join(root, directory)),
-))).flat().concat(join(root, 'experiments/README.md'), join(root, 'README.md'));
+))).flat().concat(
+  join(root, 'experiments/README.md'), join(root, 'README.md'),
+  join(root, 'AGENTS.md'), join(root, 'website/README.md'),
+);
 
 for (const path of paths.sort()) {
   const source = await readFile(path, 'utf8');

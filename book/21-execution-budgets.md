@@ -80,6 +80,27 @@ SDK 使用已保存运行状态恢复时，可以取回原有轮数与上限；�
 
 这些是应用层设计建议，不是本书声称某个库已经默认提供的全局硬额度。真正采用时，要明确哪些昂贵路径都必须经过账本，以及失败后怎样核对。
 
+```mermaid
+%% 建议的共享额度：所有昂贵路径先申请再执行
+flowchart TD
+    T[根任务身份与总额度] --> L[共享账本]
+    P[父运行] --> Q[动作适配器申请预占]
+    C[子运行] --> Q
+    R[重试或恢复后的新尝试] --> Q
+    Q --> L
+    L -->|批准| A[执行对应尝试]
+    L -->|拒绝| S[停止新动作并保存状态]
+    A --> O{用量与效果是否确定}
+    O -->|确定| B[结算实际用量并释放剩余预占]
+    O -->|未知| U[保留待核对的消费与任务编号]
+    B --> L
+```
+
+图中的账本是一项应用设计，不是把 SDK 的 `max_turns` 或图的 `recursion_limit` 换个名字。每条昂贵调用路径都需要遵守同一约定；否则绕过账本的请求仍可能让“全局限制”失效。对无法预知上界的消费，也只能声明估算和风险，不能凭事后记账承诺绝对不超支。
+
+> [!NOTE]
+> 业务幂等处理同一动作是否重复产生效果，资源账本处理每次实际尝试消耗多少。两份记录可以关联同一任务，但不能互相替代。
+
 ## 还要给验收与交接留资源
 
 如果系统把全部预算花在探索上，最后可能没有机会核对产物、保存状态和解释未完成事项。协调者再想找一个执行者来总结，也可能启动新一轮未被计入的消费。
@@ -98,4 +119,4 @@ SDK 使用已保存运行状态恢复时，可以取回原有轮数与上限；�
 [^concurrency]: [本地同步与异步工具批次](../langgraph/libs/prebuilt/langgraph/prebuilt/tool_node.py#L827-L868) · [固定源码](https://github.com/langchain-ai/langgraph/blob/41c9c22fdc83d68a2859d0c9a2b627c8615a792f/libs/prebuilt/langgraph/prebuilt/tool_node.py#L827-L868)；[同步执行器配置](https://github.com/langchain-ai/langchain/blob/bd5b134d876ef47858beef27bd29c81eeda03293/libs/core/langchain_core/runnables/config.py#L660-L675)。
 [^resume]: [本地 SDK 恢复的上限](../openai-agents-python/src/agents/run.py#L678-L697) · [固定源码](https://github.com/openai/openai-agents-python/blob/9abc9182d06dbd28330af888306031269d57a175/src/agents/run.py#L678-L697)；[恢复的当前轮数](https://github.com/openai/openai-agents-python/blob/9abc9182d06dbd28330af888306031269d57a175/src/agents/run.py#L813-L833)；[图停止位置的计算](https://github.com/langchain-ai/langgraph/blob/41c9c22fdc83d68a2859d0c9a2b627c8615a792f/libs/langgraph/langgraph/pregel/_loop.py#L1879-L1881)。更完整条件见 [预算研究](../references/studies/execution-budgets.md)。
 
-[上一章：文档里的一句话，为什么变成了行动指令？](20-trust-boundaries.md) · [下一章：谁来证明 Agent 真的完成了？](22-evaluation-and-completion.md)
+[上一章：文档里的一句话，为什么变成了行动指令？](20-trust-boundaries.md) · [下一章：评测系统：让任务完成成为可复核的结论](22-evaluation-and-completion.md)

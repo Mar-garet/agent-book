@@ -19,7 +19,7 @@ LangGraph 与 SDK 实验运行已下载的固定源码；Pi 实验调用真实�
 
 检查点采用 `InMemorySaver`，恢复发生在同一进程中。业务去重是模拟服务的显式约定；实验没有模拟真实网络、数据库事务或进程崩溃。
 
-[脚本](langgraph_interrupt_replay.py) · [原始结果](results/langgraph-interrupt-replay.json) · [第十四章](../book/14-resume-and-side-effects.md)
+[脚本](langgraph_interrupt_replay.py) · [原始结果](results/langgraph-interrupt-replay.json) · [执行恢复专题](../book/14-resume-and-side-effects.md)
 
 ## 工具错误、批次重试与图步数
 
@@ -38,7 +38,7 @@ LangGraph 与 SDK 实验运行已下载的固定源码；Pi 实验调用真实�
 
 这组结果没有覆盖异步并发、真实网络故障、取消传播或模型怎样利用错误信息。
 
-[脚本](langgraph_tool_boundaries.py) · [原始结果](results/langgraph-tool-boundaries.json) · [第十七章](../book/17-tool-results-and-retries.md) · [第二十一章](../book/21-execution-budgets.md)
+[脚本](langgraph_tool_boundaries.py) · [原始结果](results/langgraph-tool-boundaries.json) · [工具结果与重试](../book/17-tool-results-and-retries.md) · [执行预算](../book/21-execution-budgets.md)
 
 ## 委派、交接与轮数边界
 
@@ -54,7 +54,7 @@ LangGraph 与 SDK 实验运行已下载的固定源码；Pi 实验调用真实�
 
 最后一项采用的错误回调先记录异常类型，再委托给 SDK 默认错误处理器。默认处理器返回通用错误文字，不会直接暴露异常名称。协调者的最终文本也是预设响应；它说明运行正常返回与业务验收不同，不能说明真实模型必然错误宣布完成。
 
-[脚本](agents_delegation_budgets.py) · [原始结果](results/agents-delegation-budgets.json) · [第十九章](../book/19-delegation-and-handoffs.md) · [第二十一章](../book/21-execution-budgets.md)
+[脚本](agents_delegation_budgets.py) · [原始结果](results/agents-delegation-budgets.json) · [协作系统](../book/19-delegation-and-handoffs.md) · [执行预算](../book/21-execution-budgets.md)
 
 ## 摘要模型读取前的裁剪
 
@@ -73,7 +73,7 @@ LangGraph 与 SDK 实验运行已下载的固定源码；Pi 实验调用真实�
 
 它能说明部分信息在摘要前已经丢失，不能测量真实摘要质量、长任务表现或替代策略的效果。
 
-[脚本](pi_summary_input.mjs) · [原始结果](results/pi-summary-input.json) · [第十八章](../book/18-context-compaction.md)
+[脚本](pi_summary_input.mjs) · [原始结果](results/pi-summary-input.json) · [上下文压缩](../book/18-context-compaction.md)
 
 ## 产物与过程的离线验收
 
@@ -83,7 +83,7 @@ LangGraph 与 SDK 实验运行已下载的固定源码；Pi 实验调用真实�
 
 程序读取服务状态、产物与动作记录，分别给出等待、不通过或通过。它假定这些输入记录可信，且只覆盖写下的有限条件；通过这组检查不意味着验收规则已经完备。
 
-[脚本](task_acceptance.py) · [原始结果](results/task-acceptance.json) · [第二十二章](../book/22-evaluation-and-completion.md)
+[脚本](task_acceptance.py) · [原始结果](results/task-acceptance.json) · [评测系统](../book/22-evaluation-and-completion.md)
 
 ## 准备与复现
 
