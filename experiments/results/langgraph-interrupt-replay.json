@@ -1,0 +1,193 @@
+{
+  "experiment": "langgraph-interrupt-replay",
+  "recorded_at": "2026-10-17T01:30:27.696363+00:00",
+  "python": "3.12.13",
+  "platform": "Darwin-arm64",
+  "model_calls": 0,
+  "execution_scope": "Same-process interrupt/resume with InMemorySaver and a fake external service",
+  "source_commits": {
+    "langgraph": "41c9c22fdc83d68a2859d0c9a2b627c8615a792f",
+    "langchain": "bd5b134d876ef47858beef27bd29c81eeda03293"
+  },
+  "versions": {
+    "langgraph": "1.2.16",
+    "langgraph-checkpoint": "4.3.0",
+    "langgraph-prebuilt": "1.1.1",
+    "langgraph-sdk": "0.4.8",
+    "langchain-core": "1.6.12"
+  },
+  "script_sha256": "31ac2aef3a85ed40742b97550664b12421d6353cff5fd8bb257f0952fc9df62a",
+  "cases": [
+    {
+      "case": "same_node_non_idempotent",
+      "split_nodes": false,
+      "idempotent_service": false,
+      "injected_failure_before_node_commit": false,
+      "observed_failures": [],
+      "paused": {
+        "state_values": {
+          "job_id": "daily-report-2026-10-17"
+        },
+        "pending_nodes": [
+          "create_review"
+        ],
+        "create_node_entries": 1,
+        "wait_node_entries": 1,
+        "service_requests": 1,
+        "created_records": 1
+      },
+      "resumed": {
+        "state_values": {
+          "job_id": "daily-report-2026-10-17",
+          "review_id": "review-2",
+          "decision": "approved"
+        },
+        "pending_nodes": [],
+        "create_node_entries": 2,
+        "wait_node_entries": 2,
+        "service_requests": 2,
+        "created_records": 2
+      },
+      "service_events": [
+        {
+          "request": 1,
+          "outcome": "created",
+          "review_id": "review-1"
+        },
+        {
+          "request": 2,
+          "outcome": "created",
+          "review_id": "review-2"
+        }
+      ]
+    },
+    {
+      "case": "split_nodes_non_idempotent",
+      "split_nodes": true,
+      "idempotent_service": false,
+      "injected_failure_before_node_commit": false,
+      "observed_failures": [],
+      "paused": {
+        "state_values": {
+          "job_id": "daily-report-2026-10-17",
+          "review_id": "review-1"
+        },
+        "pending_nodes": [
+          "wait_for_decision"
+        ],
+        "create_node_entries": 1,
+        "wait_node_entries": 1,
+        "service_requests": 1,
+        "created_records": 1
+      },
+      "resumed": {
+        "state_values": {
+          "job_id": "daily-report-2026-10-17",
+          "review_id": "review-1",
+          "decision": "approved"
+        },
+        "pending_nodes": [],
+        "create_node_entries": 1,
+        "wait_node_entries": 2,
+        "service_requests": 1,
+        "created_records": 1
+      },
+      "service_events": [
+        {
+          "request": 1,
+          "outcome": "created",
+          "review_id": "review-1"
+        }
+      ]
+    },
+    {
+      "case": "same_node_idempotent",
+      "split_nodes": false,
+      "idempotent_service": true,
+      "injected_failure_before_node_commit": false,
+      "observed_failures": [],
+      "paused": {
+        "state_values": {
+          "job_id": "daily-report-2026-10-17"
+        },
+        "pending_nodes": [
+          "create_review"
+        ],
+        "create_node_entries": 1,
+        "wait_node_entries": 1,
+        "service_requests": 1,
+        "created_records": 1
+      },
+      "resumed": {
+        "state_values": {
+          "job_id": "daily-report-2026-10-17",
+          "review_id": "review-1",
+          "decision": "approved"
+        },
+        "pending_nodes": [],
+        "create_node_entries": 2,
+        "wait_node_entries": 2,
+        "service_requests": 2,
+        "created_records": 1
+      },
+      "service_events": [
+        {
+          "request": 1,
+          "outcome": "created",
+          "review_id": "review-1"
+        },
+        {
+          "request": 2,
+          "outcome": "reused",
+          "review_id": "review-1"
+        }
+      ]
+    },
+    {
+      "case": "split_nodes_failure_after_write",
+      "split_nodes": true,
+      "idempotent_service": false,
+      "injected_failure_before_node_commit": true,
+      "observed_failures": [
+        "Injected failure after service write, before node return"
+      ],
+      "paused": {
+        "state_values": {
+          "job_id": "daily-report-2026-10-17",
+          "review_id": "review-2"
+        },
+        "pending_nodes": [
+          "wait_for_decision"
+        ],
+        "create_node_entries": 2,
+        "wait_node_entries": 1,
+        "service_requests": 2,
+        "created_records": 2
+      },
+      "resumed": {
+        "state_values": {
+          "job_id": "daily-report-2026-10-17",
+          "review_id": "review-2",
+          "decision": "approved"
+        },
+        "pending_nodes": [],
+        "create_node_entries": 2,
+        "wait_node_entries": 2,
+        "service_requests": 2,
+        "created_records": 2
+      },
+      "service_events": [
+        {
+          "request": 1,
+          "outcome": "created",
+          "review_id": "review-1"
+        },
+        {
+          "request": 2,
+          "outcome": "created",
+          "review_id": "review-2"
+        }
+      ]
+    }
+  ]
+}

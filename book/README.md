@@ -30,15 +30,27 @@
 10. [把项目放在同一张问题地图上](10-project-comparisons.md)——比较 Pi、Codex、LangChain、LangGraph、Deep Agents 等不同选择。
 11. [从一个演示，到一个能长期工作的系统](11-design-and-experiments.md)——把前面的问题串成设计与实验。
 
+## 第五阶段：沿真实机制深入
+
+12. [用户说了停，动作为什么还在发生？](12-action-boundaries.md)——Pi 的批次调度、取消与新指令，Codex 的审批和执行边界。
+13. [默认能力，是怎样被装配出来的？](13-context-and-defaults.md)——Deep Agents 的默认配置、Pi 的上下文投影，以及子任务共享了什么。
+14. [从断点继续，为什么会再做一遍？](14-resume-and-side-effects.md)——用四个真实运行的 LangGraph 受控场景观察恢复与外部效果。
+15. [已经记住了，为什么还要等到后来才生效？](15-memory-update-boundaries.md)——Hermes 与 OpenClaw 的写入、缓存、检索、加载和整理。
+16. [同一个 MCP 服务，为什么进入两个 Agent 后表现不同？](16-mcp-host-differences.md)——Goose 与 Cline SDK 怎样组织工具身份、发现、审批、缓存和错误。
+
+这一阶段延续前面的任务情境，沿固定版本的实现解释边界。源码静态观察与实际运行的实验分别标明；读者无需先读完研究笔记。
+
 ## 附录与研究资料
 
 - [术语表](../references/glossary.md)：从第一次出现的概念回到简明定义。
 - [证据索引](../references/evidence.md)：核对过哪些材料，哪些结论仍待验证。
+- [五份源码研究记录](../references/studies/README.md)：完整调用链、默认条件、固定提交和研究边界。
+- [机制实验与复现](../experiments/README.md)：四个已运行场景、原始事件与环境记录。
 - [32 个上游仓库及下载版本](../docs/source-catalog.md)。
 - [写作与研究约定](../docs/editorial-guide.md)：后续如何把书做深。
 
 ## 当前覆盖范围
 
-本轮写到了概念、机制与设计推断，并初查了代表项目的官方材料与部分源码入口。已经形成 Pi 与 Deep Agents 的默认机制比较、LangChain 生态层次比较、三种记忆职责的比较，以及结构化工具调用与代码行动的比较。
+第一阶段书稿建立概念和比较框架；第二轮沿 Pi、Codex、Deep Agents、Hermes、OpenClaw、Goose 与 Cline SDK 的局部实现继续追踪。LangGraph 另有一组不调用模型的恢复实验，直接观察节点重入、状态交付与业务去重。
 
-32 个项目中的其余案例保留在项目地图中，标明需要继续研究的问题。运行成功率、延迟、成本、长任务稳定性，以及具体实现中的边界情况，需要按第十一章的方法实际实验，当前没有虚构测量值。
+这些研究没有覆盖各项目的所有产品入口、配置或平台。其余案例保留在项目地图中，标明后续问题。运行成功率、延迟、成本与长任务稳定性仍需另建任务集测量，不能由局部源码或单个恢复实验推导。

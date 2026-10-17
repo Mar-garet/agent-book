@@ -2,7 +2,19 @@
 
 核对日期：2026-10-17。固定版本来自 [SOURCES.json](../SOURCES.json)。本地链接便于阅读，固定提交链接用于之后复核。
 
-本轮以官方材料初查和少量源码入口为主。README 证明项目如何描述自身；内部执行细节还需要沿真实调用链继续核对。本文没有运行跨项目评测。
+第一轮核对代表项目的官方材料；第二轮增加局部执行链、默认配置和异常路径的源码研究。README 证明项目如何描述自身，实际行为仍以所引用的固定实现和配置为准。
+
+本轮实际运行了一组 LangGraph 机制实验，其余新研究为静态核对，包含阅读上游测试但没有运行这些测试。未运行跨项目评测。
+
+## 深入研究与实际实验
+
+- [Pi 与 Deep Agents](studies/pi-deepagents-execution.md)：工具批次、插话边界、上下文投影、默认装配、文件冲突与子任务状态。
+- [Codex](studies/codex-tool-execution.md)：命令策略、审批、沙箱尝试与 MCP 调用，限定入口和平台证据范围。
+- [LangGraph](studies/langgraph-interrupt-resume.md)：中断与节点重入的实现，并附 [四个已运行场景](../experiments/README.md) 和 [原始结果](../experiments/results/langgraph-interrupt-replay.json)。
+- [Hermes 与 OpenClaw](studies/openclaw-hermes-memory.md)：记忆写入、运行缓存、请求加载、索引与后台整理的不同边界。
+- [Goose 与 Cline SDK](studies/goose-cline-mcp.md)：MCP 工具目录、名称路由、审批、结果缓存与错误包装。Cline 的结论限定为研究的 SDK 路径。
+
+各记录给出本地文件与固定提交引用。正文采用其中能够解释设计取舍的部分；记录末尾的待实测事项不作为实验结论。
 
 ## P01 Pi 的默认取向
 
@@ -13,6 +25,8 @@
 ## P02 Pi 的会话与压缩
 
 材料支持：运行系统组织模型、工具、上下文和会话；活动分支提供历史，压缩以摘要替代后续请求中的部分历史，原始条目仍保留；Skill 完整说明按需加载。未实测压缩后的信息保留率。
+
+第二轮进一步区分原始会话树、有效上下文投影与实际模型输入，见 [执行与投影研究](studies/pi-deepagents-execution.md)。
 
 - [运行过程](../pi/packages/coding-agent/docs/how-pi-works.md) · [固定提交](https://github.com/earendil-works/pi/blob/8efd314fa3d3232ce197d8d7a6a5660530b9d83e/packages/coding-agent/docs/how-pi-works.md)
 - [会话与上下文](../pi/packages/coding-agent/docs/sessions.md) · [固定提交](https://github.com/earendil-works/pi/blob/8efd314fa3d3232ce197d8d7a6a5660530b9d83e/packages/coding-agent/docs/sessions.md)
@@ -29,13 +43,15 @@
 
 材料支持：项目关注长期、有状态的执行；检查点表示执行状态，Store 提供跨线程与会话的长期存储接口。本文没有声称检查点能自动撤销外部副作用。
 
+第二轮沿中断和恢复源码核对节点重入，并实际观察四个受控场景。检查点采用内存实现，同进程恢复；不覆盖真实服务事务、网络故障或进程崩溃。[机制记录](studies/langgraph-interrupt-resume.md) · [复现与结果](../experiments/README.md)
+
 - [项目说明](../langgraph/README.md) · [固定提交](https://github.com/langchain-ai/langgraph/blob/41c9c22fdc83d68a2859d0c9a2b627c8615a792f/README.md)
 - [检查点定义](../langgraph/libs/checkpoint/langgraph/checkpoint/base/__init__.py) · [固定提交](https://github.com/langchain-ai/langgraph/blob/41c9c22fdc83d68a2859d0c9a2b627c8615a792f/libs/checkpoint/langgraph/checkpoint/base/__init__.py)
 - [长期存储定义](../langgraph/libs/checkpoint/langgraph/store/base/__init__.py) · [固定提交](https://github.com/langchain-ai/langgraph/blob/41c9c22fdc83d68a2859d0c9a2b627c8615a792f/libs/checkpoint/langgraph/store/base/__init__.py)
 
 ## L02 LangChain 生态层次
 
-材料支持：Deep Agents 文档明确描述 LangGraph、LangChain agent 构建机制与 Deep Agents 的层次，并列出文件系统、子 Agent、上下文管理、记忆、Skills 与 MCP 工具等机制。默认项、可选后端与应用配置仍需进一步逐项核对。
+材料支持：Deep Agents 文档明确描述 LangGraph、LangChain agent 构建机制与 Deep Agents 的层次，并列出文件系统、子 Agent、上下文管理、记忆、Skills 与 MCP 工具等机制。第二轮已核对 Python 构建入口的默认后端、条件装配、模型配置与子任务继承；不能把功能全集当作任意最小调用的默认值。[默认装配研究](studies/pi-deepagents-execution.md)
 
 - [Deep Agents 说明与 FAQ](../deepagents/libs/deepagents/README.md) · [固定提交](https://github.com/langchain-ai/deepagents/blob/e80fd67dfaf5ef19f11a64c5d039f18b8b0c7b27/libs/deepagents/README.md)
 - [LangChain 项目说明](../langchain/README.md) · [固定提交](https://github.com/langchain-ai/langchain/blob/bd5b134d876ef47858beef27bd29c81eeda03293/README.md)
@@ -44,11 +60,15 @@
 
 材料支持：工作区 Markdown 持久信息，USER.md、MEMORY.md 与日记记录的职责，启动加载、检索与预算处理。本文没有将存储格式等同于记忆效果。
 
+第二轮沿自动注入、索引和一条 deep 整理写回路径核对来源、范围、预算与并发修改检查；没有运行这些路径。[写入与加载研究](studies/openclaw-hermes-memory.md)
+
 - [记忆设计](../openclaw/docs/concepts/memory.md) · [固定提交](https://github.com/openclaw/openclaw/blob/ec38f535d3d5de9e087d834fe58e6190852fcb2a/docs/concepts/memory.md)
 
 ## M02 Hermes 的记忆与历史
 
-材料支持：有界记忆、会话开始时的冻结快照、通过工具写入和历史搜索，以及项目描述的技能积累方向。没有把自我改进的宣传用语当作模型权重更新或成功率提升的实验证明。
+材料支持：有界记忆、启动快照、通过工具写入和历史搜索，以及项目描述的技能积累方向。普通写入不会立即改写冻结的系统记忆块；但正常在线压缩提交路径可在边界失效缓存并重新加载，保留既有前缀的后台路径又有例外。不能将“冻结”概括为整个会话永不刷新。[更新边界的源码修正](studies/openclaw-hermes-memory.md)
+
+没有把自我改进的宣传用语当作模型权重更新或成功率提升的实验证明。
 
 - [记忆机制](../hermes-agent/website/docs/user-guide/features/memory.md) · [固定提交](https://github.com/NousResearch/hermes-agent/blob/e31c674f7c523070f48f3baad0650c2fdd7ef6e5/website/docs/user-guide/features/memory.md)
 - [项目说明](../hermes-agent/README.md) · [固定提交](https://github.com/NousResearch/hermes-agent/blob/e31c674f7c523070f48f3baad0650c2fdd7ef6e5/README.md)
@@ -61,7 +81,7 @@
 
 ## C01 Codex 的工具执行边界
 
-材料支持：工具运行支撑中存在审批与沙箱相关机制，执行策略另有实现。本文只核对局部入口，不声称所有策略组合或所有平台均已验证。
+材料支持：已沿一个命令工具入口和注册 MCP 工具路径核对策略、审批、沙箱尝试、授权缓存、目录快照与错误返回。不是整个工具集合或所有平台的完整验证，也没有运行策略组合实验。[详细执行链](studies/codex-tool-execution.md)
 
 - [审批与沙箱的共享支撑](../codex/codex-rs/core/src/tools/sandboxing.rs) · [固定提交](https://github.com/openai/codex/blob/5009a99dfc07830ddf7464c26f310a2b8532b55d/codex-rs/core/src/tools/sandboxing.rs)
 - [执行策略](../codex/codex-rs/core/src/exec_policy.rs) · [固定提交](https://github.com/openai/codex/blob/5009a99dfc07830ddf7464c26f310a2b8532b55d/codex-rs/core/src/exec_policy.rs)
@@ -104,6 +124,6 @@
 
 ## 下一轮研究应当产生什么
 
-逐项目追踪一次模型请求到工具结果返回的过程，确认默认值、可选配置与扩展边界；随后按第十一章运行包含故障注入的实验。新结论应记录版本、配置和轨迹，并修改对应主题章节。
+在已有静态调用链上补运行观察：用户插话与取消、记忆纠正后的加载、工具目录变化和错误返回。恢复研究进一步区分同进程与跨进程、图状态与真实业务服务。每项新观察都应记录版本、配置和轨迹，并修改对应主题章节；不因材料已下载就视为研究完成。
 
 [返回全书目录](../book/README.md)

@@ -51,6 +51,8 @@ sequenceDiagram
 
 Pi 的当前快照提供 MCP 注册与扩展机制；Deep Agents 的材料也将 MCP 作为接入工具的方式之一。比较时应继续核对宿主如何装配和执行这些工具。[证据 P03](../references/evidence.md#p03-pi-的工具扩展) · [证据 L02](../references/evidence.md#l02-langchain-生态层次)
 
+第十六章沿 Goose 与 Cline SDK 的固定实现，继续比较工具身份、按需发现、目录更新、审批与错误。这些差异发生在宿主如何采用协议的过程里。[继续深入](16-mcp-host-differences.md)
+
 ## 三种信任关系需要分别处理
 
 第一，服务端是否是我们想连接的对象。第二，当前凭证允许访问什么。第三，返回内容应当如何影响后续行动。
