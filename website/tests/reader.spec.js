@@ -4,8 +4,8 @@ import AxeBuilder from '@axe-core/playwright';
 
 test('Chinese emphasis renders without leaking Markdown punctuation into prose', async ({ page }) => {
   for (const [id, label] of [
-    ['book/00-do-you-really-understand-agents', '带着一个问题进入下一章'],
-    ['book/10-project-comparisons', '已核对的事实'],
+    ['book/06-memory', '跨任务的持久信息'],
+    ['book/18-context-compaction', '只有前 2,000 个字符串单位'],
     ['references/studies/tool-results-and-retries', '默认策略不是捕获所有工具执行异常'],
     ['references/studies/trust-and-tool-content', '来源提示与技术强制的边界'],
   ]) {
@@ -117,7 +117,7 @@ test('theme and reading size survive a reload and Escape returns search focus', 
 test('MCP diagrams render and an upstream directory link stays on its pinned commit', async ({ page }) => {
   await page.goto('/?read=book%2F04-mcp');
   await expect(page.locator('.diagram-image svg').first()).toBeVisible();
-  await page.goto('/?read=book%2F10-project-comparisons');
+  await page.goto('/?read=references%2Fproject-map');
   const source = page.locator('.prose a').filter({ hasText: 'Codex CLI' });
   await expect(source).toHaveAttribute('href', 'https://github.com/openai/codex/tree/5009a99dfc07830ddf7464c26f310a2b8532b55d');
 });

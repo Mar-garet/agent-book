@@ -6,7 +6,7 @@ import GithubSlugger from 'github-slugger';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const manifest = JSON.parse(await readFile(join(root, 'SOURCES.json'), 'utf8'));
 const index = await readFile(join(root, 'book/README.md'), 'utf8');
-const comparison = await readFile(join(root, 'book/10-project-comparisons.md'), 'utf8');
+const projectMap = await readFile(join(root, 'references/project-map.md'), 'utf8');
 const phases = [];
 let phase;
 for (const line of index.split('\n')) {
@@ -92,7 +92,7 @@ const browsingCategories = {
 };
 const projects = manifest.repositories.map((item) => {
   const escaped = item.directory.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const row = comparison.match(new RegExp(`\\| \\[[^\\]]+\\]\\(\\.\\./${escaped}/\\) \\| ([^|]+)\\| ([^|]+)\\|`));
+  const row = projectMap.match(new RegExp(`\\| \\[[^\\]]+\\]\\(\\.\\./${escaped}/\\) \\| ([^|]+)\\| ([^|]+)\\|`));
   return {
     name: item.name, directory: item.directory, category: browsingCategories[item.category] || item.category,
     repository: item.repository, url: item.url, commit: item.commit,
