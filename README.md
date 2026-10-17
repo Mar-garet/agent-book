@@ -32,8 +32,8 @@
 已经在本机下载的源码可以直接阅读。以后克隆本书时，可按需要下载案例：
 
 ```bash
-git clone <本书仓库地址>
-cd <本书目录>
+git clone https://github.com/Mar-garet/agent_book.git
+cd agent_book
 git submodule update --init --depth 1 pi langchain langgraph codex
 ```
 
