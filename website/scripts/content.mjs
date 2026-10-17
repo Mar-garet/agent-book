@@ -44,7 +44,7 @@ for (const file of paths.sort()) {
   const source = await readFile(file, 'utf8');
   const title = source.match(/^# (.+)$/m)?.[1] ?? path;
   const body = source.replace(/^# .+\n+/, '')
-    .replace(/\n\[(?:上一章|返回全书目录|对应正文|返回证据索引)[^\n]*\n?$/, '').trim();
+    .replace(/\n\[(?:上一章|返回全书目录|对应正文|返回参考资料)[^\n]*\n?$/, '').trim();
   const slugger = new GithubSlugger();
   const headings = [];
   let fenced = false;
@@ -105,11 +105,18 @@ for (const doc of documents) {
   await mkdir(dirname(manuscript), { recursive: true });
   await copyFile(join(root, doc.path), manuscript);
 }
-const attachments = [
-  'SOURCES.json', 'experiments/langgraph_interrupt_replay.py',
-  'experiments/dependencies.lock', 'experiments/results/langgraph-interrupt-replay.json',
-  'scripts/check_book.py',
-];
+const experiments = JSON.parse(await readFile(join(root, 'experiments/manifest.json'), 'utf8'));
+const experimentFiles = experiments.experiments.flatMap(
+  ({ script, result, dependency_locks: locks }) => [script, result, ...locks],
+);
+for (const file of experimentFiles) {
+  if (!file.startsWith('experiments/') || file.split('/').includes('..')) {
+    throw new Error(`Invalid experiment attachment path: ${file}`);
+  }
+}
+const attachments = [...new Set([
+  'SOURCES.json', 'experiments/manifest.json', ...experimentFiles, 'scripts/check_book.py',
+])];
 for (const file of attachments) {
   const destination = join(downloadsDirectory, file);
   await mkdir(dirname(destination), { recursive: true });

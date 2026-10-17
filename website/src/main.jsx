@@ -84,7 +84,7 @@ function Sidebar({ current, lastRead, onNavigate }) {
       </section>)}
     </nav>
     <div className="sidebar-bottom">
-      <a href={hrefFor('references/evidence')} onClick={onNavigate}><Icon icon={FileText} size={16} />研究与证据<Icon icon={ArrowUpRight} size={14} /></a>
+      <a href={hrefFor('references/evidence')} onClick={onNavigate}><Icon icon={FileText} size={16} />源码与研究<Icon icon={ArrowUpRight} size={14} /></a>
       {lastRead && <a href={hrefFor(lastRead)} onClick={onNavigate} className="last-read">继续上次阅读<Icon icon={ArrowRight} size={14} /></a>}
     </div>
   </>;
@@ -143,7 +143,7 @@ function Home({ lastRead }) {
 }
 
 function Footer() {
-  return <footer className="footer"><span>思想是主线，项目是案例，源码是证据。</span><a href={AUTHOR} target="_blank" rel="noreferrer">Mar-garet<Icon icon={ArrowUpRight} size={14} /></a></footer>;
+  return <footer className="footer"><span>从开源实现理解 Agent 的设计。</span><a href={AUTHOR} target="_blank" rel="noreferrer">Mar-garet<Icon icon={ArrowUpRight} size={14} /></a></footer>;
 }
 
 function Contents({ visited }) {
@@ -159,7 +159,7 @@ function Contents({ visited }) {
         </a>)}
       </div>
     </section>)}
-    <div className="appendix-links"><h2>把理解交给证据</h2><div><a href={hrefFor('references/glossary')}>术语表<Icon icon={ArrowUpRight} size={17} /></a><a href={hrefFor('references/studies/README')}>源码研究<Icon icon={ArrowUpRight} size={17} /></a><a href={hrefFor('experiments/README')}>机制实验<Icon icon={ArrowUpRight} size={17} /></a></div></div>
+    <div className="appendix-links"><h2>源码与实验</h2><div><a href={hrefFor('references/glossary')}>术语表<Icon icon={ArrowUpRight} size={17} /></a><a href={hrefFor('references/studies/README')}>源码研究<Icon icon={ArrowUpRight} size={17} /></a><a href={hrefFor('experiments/README')}>机制实验<Icon icon={ArrowUpRight} size={17} /></a></div></div>
     <Footer />
   </main>;
 }
@@ -277,7 +277,7 @@ function Reader({ doc, theme, fontSize, setFontSize }) {
           <div className="breadcrumbs"><a href="?page=contents">全书目录</a><span>/</span><span>{phase?.title || doc.kind}</span></div>
           <div className="article-meta"><span>{doc.number === null ? doc.kind : doc.number === 0 ? '开篇' : `第 ${doc.number} 章`}</span><span>约 {doc.minutes} 分钟</span></div>
           <h1>{doc.displayTitle}</h1>
-          <div className="article-tools"><span>以问题为线索，以证据形成判断。</span><div className="font-controls" role="group" aria-label="正文字号"><Icon icon={TextAa} size={18} /><button disabled={fontSize <= 16} onClick={() => setFontSize(fontSize - 1)} aria-label="减小字号">小</button><button disabled={fontSize >= 23} onClick={() => setFontSize(fontSize + 1)} aria-label="增大字号">大</button></div></div>
+          <div className="article-tools"><span>对照源码，理解设计取舍。</span><div className="font-controls" role="group" aria-label="正文字号"><Icon icon={TextAa} size={18} /><button disabled={fontSize <= 16} onClick={() => setFontSize(fontSize - 1)} aria-label="减小字号">小</button><button disabled={fontSize >= 23} onClick={() => setFontSize(fontSize + 1)} aria-label="增大字号">大</button></div></div>
         </header>
         <div className="prose">{body.text !== undefined ? markdown
           : body.error ? <div className="chapter-load-error" role="alert"><p>本章暂未加载成功。</p><button className="button secondary" onClick={() => setLoadAttempt((attempt) => attempt + 1)}>重新加载</button></div>
@@ -285,7 +285,7 @@ function Reader({ doc, theme, fontSize, setFontSize }) {
         <div className="article-source"><a href={`./manuscript/${doc.path}`} download={doc.path.split('/').pop()}><Icon icon={FileText} size={17} />下载本章 Markdown<Icon icon={ArrowDown} size={15} /></a></div>
         {chapterIndex >= 0 && <nav className="chapter-pagination" aria-label="前后章节">
           {previous ? <a href={hrefFor(previous.id)}><span><Icon icon={ArrowLeft} size={16} />上一章</span><strong>{previous.title}</strong></a> : <a href="?page=contents"><span><Icon icon={Books} size={16} />阅读路线</span><strong>全书目录</strong></a>}
-          {next ? <a href={hrefFor(next.id)} className="next-chapter"><span>下一章<Icon icon={ArrowRight} size={16} /></span><strong>{next.title}</strong></a> : <a href={hrefFor('references/studies/README')} className="next-chapter"><span>继续探索<Icon icon={ArrowRight} size={16} /></span><strong>源码研究与证据</strong></a>}
+          {next ? <a href={hrefFor(next.id)} className="next-chapter"><span>下一章<Icon icon={ArrowRight} size={16} /></span><strong>{next.title}</strong></a> : <a href={hrefFor('references/studies/README')} className="next-chapter"><span>继续探索<Icon icon={ArrowRight} size={16} /></span><strong>源码研究与实验</strong></a>}
         </nav>}
       </article>
       <aside className="on-this-page" aria-label="本章目录"><h2>本章内容</h2>{doc.headings.map((heading) => <a key={heading.id} href={hrefFor(doc.id, `#${heading.id}`)} className={`${activeHeading === heading.id ? 'active' : ''} ${heading.level === 3 ? 'nested' : ''}`}>{heading.text}</a>)}<a className="toc-top" href={hrefFor(doc.id, '#main-content')}>回到顶部<Icon icon={ArrowUpRight} size={14} /></a></aside>

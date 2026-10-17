@@ -1,0 +1,281 @@
+{
+  "experiment": "task-acceptance",
+  "recorded_at": "2026-10-17T03:24:06.414587+00:00",
+  "python": "3.12.13",
+  "platform": "Darwin-arm64",
+  "model_calls": 0,
+  "source_commits": {},
+  "execution_scope": "Application-side validator over synthetic receipts, artifacts and audit facts",
+  "fixture_selection": "Hand-picked counterexamples; not a representative task set or model benchmark",
+  "claims_are_scripted": true,
+  "assumptions": [
+    "The fixture service state and audit records are trusted inputs to this verifier",
+    "Amounts are invented example data with ground truth specified by the task author",
+    "No service, file mutation, real approval or model decision is being simulated as executed",
+    "The finite contract does not cover every possible business invariant"
+  ],
+  "script_sha256": "b30451a5c5b65a4fcbace3998eb1f35bc5d52d9018363ec8cad56ebd28c07248",
+  "cases": [
+    {
+      "case": "queued_receipt",
+      "contract": {
+        "job_id": "job-42",
+        "environment": "test",
+        "expected_totals": {
+          "2026-10-15": 120,
+          "2026-10-16": 140
+        },
+        "read_only": true
+      },
+      "observation": {
+        "job_status": "queued",
+        "artifact_id": null,
+        "observed_actions": [],
+        "application_stop_reason": null
+      },
+      "candidate_claim": "done",
+      "claim_only_acceptance": true,
+      "contract_assessment": "waiting",
+      "assessment_reason": "The service has not produced a final result",
+      "artifact_fixture": null
+    },
+    {
+      "case": "missing_date",
+      "contract": {
+        "job_id": "job-42",
+        "environment": "test",
+        "expected_totals": {
+          "2026-10-15": 120,
+          "2026-10-16": 140
+        },
+        "read_only": true
+      },
+      "observation": {
+        "job_status": "completed",
+        "artifact_id": "missing-date",
+        "observed_actions": [],
+        "application_stop_reason": null
+      },
+      "candidate_claim": "done",
+      "claim_only_acceptance": true,
+      "contract_assessment": "rejected",
+      "assessment_reason": "The artifact has missing or unexpected dates",
+      "artifact_fixture": {
+        "artifact_id": "missing-date",
+        "job_id": "job-42",
+        "environment": "test",
+        "totals": {
+          "2026-10-15": 120
+        }
+      }
+    },
+    {
+      "case": "wrong_environment",
+      "contract": {
+        "job_id": "job-42",
+        "environment": "test",
+        "expected_totals": {
+          "2026-10-15": 120,
+          "2026-10-16": 140
+        },
+        "read_only": true
+      },
+      "observation": {
+        "job_status": "completed",
+        "artifact_id": "wrong-environment",
+        "observed_actions": [],
+        "application_stop_reason": null
+      },
+      "candidate_claim": "done",
+      "claim_only_acceptance": true,
+      "contract_assessment": "rejected",
+      "assessment_reason": "The artifact is from the wrong environment",
+      "artifact_fixture": {
+        "artifact_id": "wrong-environment",
+        "job_id": "job-42",
+        "environment": "production",
+        "totals": {
+          "2026-10-15": 120,
+          "2026-10-16": 140
+        }
+      }
+    },
+    {
+      "case": "unauthorized_write",
+      "contract": {
+        "job_id": "job-42",
+        "environment": "test",
+        "expected_totals": {
+          "2026-10-15": 120,
+          "2026-10-16": 140
+        },
+        "read_only": true
+      },
+      "observation": {
+        "job_status": "completed",
+        "artifact_id": "report-42",
+        "observed_actions": [
+          "read",
+          "write"
+        ],
+        "application_stop_reason": null
+      },
+      "candidate_claim": "done",
+      "claim_only_acceptance": true,
+      "contract_assessment": "rejected",
+      "assessment_reason": "An observed action violated the read-only contract",
+      "artifact_fixture": {
+        "artifact_id": "report-42",
+        "job_id": "job-42",
+        "environment": "test",
+        "totals": {
+          "2026-10-15": 120,
+          "2026-10-16": 140
+        }
+      }
+    },
+    {
+      "case": "stale_artifact",
+      "contract": {
+        "job_id": "job-42",
+        "environment": "test",
+        "expected_totals": {
+          "2026-10-15": 120,
+          "2026-10-16": 140
+        },
+        "read_only": true
+      },
+      "observation": {
+        "job_status": "completed",
+        "artifact_id": "stale-job",
+        "observed_actions": [],
+        "application_stop_reason": null
+      },
+      "candidate_claim": "done",
+      "claim_only_acceptance": true,
+      "contract_assessment": "rejected",
+      "assessment_reason": "The artifact belongs to a different job",
+      "artifact_fixture": {
+        "artifact_id": "stale-job",
+        "job_id": "job-previous",
+        "environment": "test",
+        "totals": {
+          "2026-10-15": 120,
+          "2026-10-16": 140
+        }
+      }
+    },
+    {
+      "case": "missing_artifact",
+      "contract": {
+        "job_id": "job-42",
+        "environment": "test",
+        "expected_totals": {
+          "2026-10-15": 120,
+          "2026-10-16": 140
+        },
+        "read_only": true
+      },
+      "observation": {
+        "job_status": "completed",
+        "artifact_id": "not-found",
+        "observed_actions": [],
+        "application_stop_reason": null
+      },
+      "candidate_claim": "done",
+      "claim_only_acceptance": true,
+      "contract_assessment": "rejected",
+      "assessment_reason": "A completed receipt has no verifiable artifact",
+      "artifact_fixture": null
+    },
+    {
+      "case": "wrong_business_values",
+      "contract": {
+        "job_id": "job-42",
+        "environment": "test",
+        "expected_totals": {
+          "2026-10-15": 120,
+          "2026-10-16": 140
+        },
+        "read_only": true
+      },
+      "observation": {
+        "job_status": "completed",
+        "artifact_id": "wrong-values",
+        "observed_actions": [],
+        "application_stop_reason": null
+      },
+      "candidate_claim": "done",
+      "claim_only_acceptance": true,
+      "contract_assessment": "rejected",
+      "assessment_reason": "The dates are present but the business values are wrong",
+      "artifact_fixture": {
+        "artifact_id": "wrong-values",
+        "job_id": "job-42",
+        "environment": "test",
+        "totals": {
+          "2026-10-15": 120,
+          "2026-10-16": 0
+        }
+      }
+    },
+    {
+      "case": "verified_completion",
+      "contract": {
+        "job_id": "job-42",
+        "environment": "test",
+        "expected_totals": {
+          "2026-10-15": 120,
+          "2026-10-16": 140
+        },
+        "read_only": true
+      },
+      "observation": {
+        "job_status": "completed",
+        "artifact_id": "report-42",
+        "observed_actions": [
+          "read"
+        ],
+        "application_stop_reason": null
+      },
+      "candidate_claim": "done",
+      "claim_only_acceptance": true,
+      "contract_assessment": "accepted",
+      "assessment_reason": "Artifact, provenance, business values and observed actions match this contract",
+      "artifact_fixture": {
+        "artifact_id": "report-42",
+        "job_id": "job-42",
+        "environment": "test",
+        "totals": {
+          "2026-10-15": 120,
+          "2026-10-16": 140
+        }
+      }
+    },
+    {
+      "case": "budget_stop_with_running_job",
+      "contract": {
+        "job_id": "job-42",
+        "environment": "test",
+        "expected_totals": {
+          "2026-10-15": 120,
+          "2026-10-16": 140
+        },
+        "read_only": true
+      },
+      "observation": {
+        "job_status": "running",
+        "artifact_id": null,
+        "observed_actions": [
+          "read"
+        ],
+        "application_stop_reason": "budget_exhausted"
+      },
+      "candidate_claim": "stopped_while_waiting",
+      "claim_only_acceptance": false,
+      "contract_assessment": "waiting",
+      "assessment_reason": "The service has not produced a final result",
+      "artifact_fixture": null
+    }
+  ]
+}

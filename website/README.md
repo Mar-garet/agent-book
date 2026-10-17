@@ -2,7 +2,7 @@
 
 [在线阅读，免登录访问](https://mar-garet.github.io/agent_book/)。
 
-纸白底色、朱红点缀与出版物排版，为长文阅读组织目录、正文和证据。章节与研究记录来自主仓库的 Markdown，项目地图来自 SOURCES.json 和第十章，内容维护仍在原文件中完成。
+纸白底色、朱红点缀与出版物排版，为长文阅读组织目录、正文和参考资料。章节与研究记录来自主仓库的 Markdown，项目地图来自 SOURCES.json 和第十章，内容维护仍在原文件中完成。
 
 ![阅读首页](../docs/assets/reader-desktop.webp)
 

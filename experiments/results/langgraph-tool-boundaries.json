@@ -1,0 +1,314 @@
+{
+  "experiment": "langgraph-tool-boundaries",
+  "recorded_at": "2026-10-17T03:18:59.485858+00:00",
+  "python": "3.12.13",
+  "platform": "Darwin-arm64",
+  "model_calls": 0,
+  "execution_scope": "Compiled one-node tool graphs, deterministic fake service, sequential tool dispatch",
+  "source_commits": {
+    "langgraph": "41c9c22fdc83d68a2859d0c9a2b627c8615a792f",
+    "langchain": "bd5b134d876ef47858beef27bd29c81eeda03293"
+  },
+  "versions": {
+    "langgraph": "1.2.16",
+    "langgraph-checkpoint": "4.3.0",
+    "langgraph-prebuilt": "1.1.1",
+    "langgraph-sdk": "0.4.8",
+    "langchain-core": "1.6.12"
+  },
+  "script_sha256": "8b885cc1187a470903177313721a249fc84b4d7b15f67fa98721a66d3090c2af",
+  "cases": [
+    {
+      "case": "invalid_arguments_default_handler",
+      "handle_tool_errors": "default",
+      "explicit_retry_on_runtime_error": false,
+      "config": {
+        "max_concurrency": 1,
+        "recursion_limit": 10
+      },
+      "raised": null,
+      "created_records": 0,
+      "check_calls": 0,
+      "returned_tool_messages": [
+        {
+          "tool_call_id": "invalid-1",
+          "status": "error",
+          "content": "Error invoking tool 'create_review' with kwargs {} with error:\n job_id: Field required\n Please fix the error and try again."
+        }
+      ],
+      "service_events": []
+    },
+    {
+      "case": "business_failure_default_handler",
+      "handle_tool_errors": "default",
+      "explicit_retry_on_runtime_error": false,
+      "config": {
+        "max_concurrency": 1,
+        "recursion_limit": 10
+      },
+      "raised": "RuntimeError",
+      "created_records": 1,
+      "check_calls": 1,
+      "returned_tool_messages": [],
+      "service_events": [
+        {
+          "operation": "create",
+          "job_id": "job-1",
+          "review_id": "review-1"
+        },
+        {
+          "operation": "check",
+          "job_id": "job-1",
+          "failed": true
+        }
+      ]
+    },
+    {
+      "case": "business_failure_returned_as_message",
+      "handle_tool_errors": true,
+      "explicit_retry_on_runtime_error": false,
+      "config": {
+        "max_concurrency": 1,
+        "recursion_limit": 10
+      },
+      "raised": null,
+      "created_records": 1,
+      "check_calls": 1,
+      "returned_tool_messages": [
+        {
+          "tool_call_id": "create-1",
+          "status": "success",
+          "content": "review-1"
+        },
+        {
+          "tool_call_id": "check-1",
+          "status": "error",
+          "content": "Error: RuntimeError('Injected review check failure')\n Please fix your mistakes."
+        }
+      ],
+      "service_events": [
+        {
+          "operation": "create",
+          "job_id": "job-1",
+          "review_id": "review-1"
+        },
+        {
+          "operation": "check",
+          "job_id": "job-1",
+          "failed": true
+        }
+      ]
+    },
+    {
+      "case": "node_retry_repeats_successful_sibling",
+      "handle_tool_errors": "default",
+      "explicit_retry_on_runtime_error": true,
+      "config": {
+        "max_concurrency": 1,
+        "recursion_limit": 10
+      },
+      "raised": null,
+      "created_records": 2,
+      "check_calls": 2,
+      "returned_tool_messages": [
+        {
+          "tool_call_id": "create-1",
+          "status": "success",
+          "content": "review-2"
+        },
+        {
+          "tool_call_id": "check-1",
+          "status": "success",
+          "content": "checked"
+        }
+      ],
+      "service_events": [
+        {
+          "operation": "create",
+          "job_id": "job-1",
+          "review_id": "review-1"
+        },
+        {
+          "operation": "check",
+          "job_id": "job-1",
+          "failed": true
+        },
+        {
+          "operation": "create",
+          "job_id": "job-1",
+          "review_id": "review-2"
+        },
+        {
+          "operation": "check",
+          "job_id": "job-1",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "case": "caught_failure_does_not_trigger_node_retry",
+      "handle_tool_errors": true,
+      "explicit_retry_on_runtime_error": true,
+      "config": {
+        "max_concurrency": 1,
+        "recursion_limit": 10
+      },
+      "raised": null,
+      "created_records": 1,
+      "check_calls": 1,
+      "returned_tool_messages": [
+        {
+          "tool_call_id": "create-1",
+          "status": "success",
+          "content": "review-1"
+        },
+        {
+          "tool_call_id": "check-1",
+          "status": "error",
+          "content": "Error: RuntimeError('Injected review check failure')\n Please fix your mistakes."
+        }
+      ],
+      "service_events": [
+        {
+          "operation": "create",
+          "job_id": "job-1",
+          "review_id": "review-1"
+        },
+        {
+          "operation": "check",
+          "job_id": "job-1",
+          "failed": true
+        }
+      ]
+    },
+    {
+      "case": "unknown_tool_with_handler_disabled",
+      "handle_tool_errors": false,
+      "explicit_retry_on_runtime_error": false,
+      "config": {
+        "max_concurrency": 1,
+        "recursion_limit": 10
+      },
+      "raised": null,
+      "created_records": 0,
+      "check_calls": 0,
+      "returned_tool_messages": [
+        {
+          "tool_call_id": "unknown-1",
+          "status": "error",
+          "content": "Error: missing_tool is not a valid tool, try one of [create_review, check_review]."
+        }
+      ],
+      "service_events": []
+    },
+    {
+      "case": "three_tool_calls_before_one_step_limit_error",
+      "handle_tool_errors": "default",
+      "explicit_retry_on_runtime_error": false,
+      "config": {
+        "max_concurrency": 1,
+        "recursion_limit": 1
+      },
+      "raised": "GraphRecursionError",
+      "created_records": 3,
+      "check_calls": 0,
+      "returned_tool_messages": [],
+      "service_events": [
+        {
+          "operation": "create",
+          "job_id": "job-1",
+          "review_id": "review-1"
+        },
+        {
+          "operation": "create",
+          "job_id": "job-2",
+          "review_id": "review-2"
+        },
+        {
+          "operation": "create",
+          "job_id": "job-3",
+          "review_id": "review-3"
+        }
+      ]
+    },
+    {
+      "case": "three_tool_calls_complete_with_two_step_limit",
+      "handle_tool_errors": "default",
+      "explicit_retry_on_runtime_error": false,
+      "config": {
+        "max_concurrency": 1,
+        "recursion_limit": 2
+      },
+      "raised": null,
+      "created_records": 3,
+      "check_calls": 0,
+      "returned_tool_messages": [
+        {
+          "tool_call_id": "create-1",
+          "status": "success",
+          "content": "review-1"
+        },
+        {
+          "tool_call_id": "create-2",
+          "status": "success",
+          "content": "review-2"
+        },
+        {
+          "tool_call_id": "create-3",
+          "status": "success",
+          "content": "review-3"
+        }
+      ],
+      "service_events": [
+        {
+          "operation": "create",
+          "job_id": "job-1",
+          "review_id": "review-1"
+        },
+        {
+          "operation": "create",
+          "job_id": "job-2",
+          "review_id": "review-2"
+        },
+        {
+          "operation": "create",
+          "job_id": "job-3",
+          "review_id": "review-3"
+        }
+      ]
+    },
+    {
+      "case": "graph_steps_do_not_count_external_actions",
+      "recursion_limit": 3,
+      "node_visits": 3,
+      "fake_external_actions": 6,
+      "raised": "GraphRecursionError",
+      "events": [
+        {
+          "visit": 1,
+          "action": 1
+        },
+        {
+          "visit": 1,
+          "action": 2
+        },
+        {
+          "visit": 2,
+          "action": 1
+        },
+        {
+          "visit": 2,
+          "action": 2
+        },
+        {
+          "visit": 3,
+          "action": 1
+        },
+        {
+          "visit": 3,
+          "action": 2
+        }
+      ]
+    }
+  ]
+}

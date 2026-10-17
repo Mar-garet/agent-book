@@ -50,7 +50,7 @@ flowchart LR
 
 ## LangChain、LangGraph 与 Deep Agents 的关系
 
-这三个项目适合用来理解“层次”。在本次快照的 Deep Agents 文档中，LangGraph 提供图执行基础；LangChain 的 agent 构建机制在其上组织较轻的行动循环；Deep Agents 再提供文件系统、子 Agent 和上下文管理等默认机制。[证据 L02](../references/evidence.md#l02-langchain-生态层次)
+这三个项目适合用来理解“层次”。在本次快照的 Deep Agents 文档中，LangGraph 提供图执行基础；LangChain 的 agent 构建机制在其上组织较轻的行动循环；Deep Agents 再提供文件系统、子 Agent 和上下文管理等默认机制。[参考 L02](../references/evidence.md#l02-langchain-生态层次)
 
 读者可以把它们理解为逐层组合的选择。应用需要的流程越特殊，就越可能需要自己安排控制结构；希望直接采用更多长任务默认机制时，可以从更完整的运行系统开始。
 
@@ -61,7 +61,5 @@ flowchart LR
 每当项目写下“支持工具”“支持记忆”“支持多 Agent”，先追问三个细节：默认是否启用，谁负责配置，失败后由谁处理。
 
 这些问题会把功能名称还原为真实过程。后续章节将沿着过程展开。
-
-**本章自测：**假设模型建议执行一条命令，权限检查拒绝了它。请分别说明模型、运行系统和工具在这一步做了什么。
 
 [上一章](00-do-you-really-understand-agents.md) · [下一章：从一次回答，到一个行动循环](02-the-agent-loop.md)

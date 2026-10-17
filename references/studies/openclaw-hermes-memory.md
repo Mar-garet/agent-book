@@ -9,7 +9,7 @@
 
 用户提供新事实或偏好；模型决定是否调用保存工具、保存哪段内容；存储程序检查参数、长度和写入条件，并把内容写到文件；提示词组装程序或检索程序再决定哪些内容进入下一次模型输入。**写入、检索、注入、采纳是四个不同动作。**
 
-Hermes 的本次研究范围有两个模型可见入口：`memory` 负责修改精选记忆，`session_search` 负责找回会话材料。前者持有的 MemoryStore 是文件适配与状态管理对象，不是另一个模型。模型选择 target 和操作，MemoryStore 执行写盘；系统提示词构造器读取一份冻结快照，会话循环决定何时重建该前缀。证据见事实 1–5。
+Hermes 的本次研究范围有两个模型可见入口：`memory` 负责修改精选记忆，`session_search` 负责找回会话材料。前者持有的 MemoryStore 是文件适配与状态管理对象，不是另一个模型。模型选择 target 和操作，MemoryStore 执行写盘；系统提示词构造器读取一份冻结快照，会话循环决定何时重建该前缀。具体实现见事实 1–5。
 
 ```text
 用户事实/偏好
@@ -21,7 +21,7 @@ AIAgent 的加载时快照 → 缓存系统提示词 → active_system_prompt �
                      ↑ live-agent 压缩提交边界会重载并重建
 ```
 
-OpenClaw 在这里没有一个统一的“读写记忆 API”统管所有动作。日常 Agent 可用文件工具写工作区；bootstrap（运行前加载的基础上下文）挑选可注入文件，memory-core 插件提供 `memory_search` / `memory_get` 与索引，dreaming 则由维护调度触发候选整理及受约束的写回。下文将这几条链分开核对；不把模型被提示“应当记住”当成程序已经写入。证据见事实 6–12。
+OpenClaw 在这里没有一个统一的“读写记忆 API”统管所有动作。日常 Agent 可用文件工具写工作区；bootstrap（运行前加载的基础上下文）挑选可注入文件，memory-core 插件提供 `memory_search` / `memory_get` 与索引，dreaming 则由维护调度触发候选整理及受约束的写回。下文将这几条链分开核对；不把模型被提示“应当记住”当成程序已经写入。具体实现见事实 6–12。
 
 ```text
 文件写入 → 工作区 USER / MEMORY / 每日日记
@@ -37,9 +37,9 @@ OpenClaw 在这里没有一个统一的“读写记忆 API”统管所有动作�
 
 **实现事实：** MemoryStore 初始化从 MEMORY.md / USER.md 读入 live entries，并额外生成 `_system_prompt_snapshot`；之后 `format_for_system_prompt` 只返回这份快照。普通 `_mutate` 修改 live entries 和磁盘，不改快照。系统提示词构造器再把快照拼成记忆块。初始化默认路径来自 profile 对应的 Hermes home。[本地 1322–1340 行](../../hermes-agent/agent/agent_init.py#L1322) · [固定源码](https://github.com/NousResearch/hermes-agent/blob/e31c674f7c523070f48f3baad0650c2fdd7ef6e5/agent/agent_init.py#L1322-L1340) [本地 221–253 行](../../hermes-agent/tools/memory_tool_store.py#L221) · [固定源码](https://github.com/NousResearch/hermes-agent/blob/e31c674f7c523070f48f3baad0650c2fdd7ef6e5/tools/memory_tool_store.py#L221-L253) [本地 338–367 行](../../hermes-agent/tools/memory_tool_store.py#L338) · [固定源码](https://github.com/NousResearch/hermes-agent/blob/e31c674f7c523070f48f3baad0650c2fdd7ef6e5/tools/memory_tool_store.py#L338-L367) [本地 618–621 行](../../hermes-agent/tools/memory_tool_store.py#L618) · [固定源码](https://github.com/NousResearch/hermes-agent/blob/e31c674f7c523070f48f3baad0650c2fdd7ef6e5/tools/memory_tool_store.py#L618-L621) [本地 516–525 行](../../hermes-agent/agent/system_prompt.py#L516) · [固定源码](https://github.com/NousResearch/hermes-agent/blob/e31c674f7c523070f48f3baad0650c2fdd7ef6e5/agent/system_prompt.py#L516-L525) [本地 38–40 行](../../hermes-agent/tools/memory_tool.py#L38) · [固定源码](https://github.com/NousResearch/hermes-agent/blob/e31c674f7c523070f48f3baad0650c2fdd7ef6e5/tools/memory_tool.py#L38-L40)
 
-**调用方证据：** 普通 live-agent 压缩流程在准备提交时调用 `_rebuild_system_prompt_at_boundary`；该函数调用 `agent._invalidate_system_prompt()`，后者清掉缓存并重新 `load_from_disk()`，随后边界函数重建系统提示词并保存新的缓存。不是只靠“注释声称会重载”。[本地 4252–4258 行](../../hermes-agent/agent/conversation_compression.py#L4252) · [固定源码](https://github.com/NousResearch/hermes-agent/blob/e31c674f7c523070f48f3baad0650c2fdd7ef6e5/agent/conversation_compression.py#L4252-L4258) [本地 3094–3125 行](../../hermes-agent/agent/conversation_compression.py#L3094) · [固定源码](https://github.com/NousResearch/hermes-agent/blob/e31c674f7c523070f48f3baad0650c2fdd7ef6e5/agent/conversation_compression.py#L3094-L3125) [本地 808–826 行](../../hermes-agent/agent/system_prompt.py#L808) · [固定源码](https://github.com/NousResearch/hermes-agent/blob/e31c674f7c523070f48f3baad0650c2fdd7ef6e5/agent/system_prompt.py#L808-L826)
+**调用方实现：** 普通 live-agent 压缩流程在准备提交时调用 `_rebuild_system_prompt_at_boundary`；该函数调用 `agent._invalidate_system_prompt()`，后者清掉缓存并重新 `load_from_disk()`，随后边界函数重建系统提示词并保存新的缓存。不是只靠“注释声称会重载”。[本地 4252–4258 行](../../hermes-agent/agent/conversation_compression.py#L4252) · [固定源码](https://github.com/NousResearch/hermes-agent/blob/e31c674f7c523070f48f3baad0650c2fdd7ef6e5/agent/conversation_compression.py#L4252-L4258) [本地 3094–3125 行](../../hermes-agent/agent/conversation_compression.py#L3094) · [固定源码](https://github.com/NousResearch/hermes-agent/blob/e31c674f7c523070f48f3baad0650c2fdd7ef6e5/agent/conversation_compression.py#L3094-L3125) [本地 808–826 行](../../hermes-agent/agent/system_prompt.py#L808) · [固定源码](https://github.com/NousResearch/hermes-agent/blob/e31c674f7c523070f48f3baad0650c2fdd7ef6e5/agent/system_prompt.py#L808-L826)
 
-**模型输入证据：** 普通下一轮先使用缓存系统提示词；开始时的压缩可替换 active_system_prompt，模型请求构造器再将 active_system_prompt 作为 system 消息放到 api_messages 开头。继续已有会话时，即使创建了新的运行对象，也可以从数据库恢复旧的系统提示词原字节，所以“重启进程”等于“新建逻辑会话”是不成立的。[本地 1139–1142 行](../../hermes-agent/agent/turn_context.py#L1139) · [固定源码](https://github.com/NousResearch/hermes-agent/blob/e31c674f7c523070f48f3baad0650c2fdd7ef6e5/agent/turn_context.py#L1139-L1142) [本地 1166–1173 行](../../hermes-agent/agent/turn_context.py#L1166) · [固定源码](https://github.com/NousResearch/hermes-agent/blob/e31c674f7c523070f48f3baad0650c2fdd7ef6e5/agent/turn_context.py#L1166-L1173) [本地 1346–1354 行](../../hermes-agent/agent/turn_context.py#L1346) · [固定源码](https://github.com/NousResearch/hermes-agent/blob/e31c674f7c523070f48f3baad0650c2fdd7ef6e5/agent/turn_context.py#L1346-L1354) [本地 803–805 行](../../hermes-agent/agent/conversation_loop.py#L803) · [固定源码](https://github.com/NousResearch/hermes-agent/blob/e31c674f7c523070f48f3baad0650c2fdd7ef6e5/agent/conversation_loop.py#L803-L805)
+**模型输入路径：** 普通下一轮先使用缓存系统提示词；开始时的压缩可替换 active_system_prompt，模型请求构造器再将 active_system_prompt 作为 system 消息放到 api_messages 开头。继续已有会话时，即使创建了新的运行对象，也可以从数据库恢复旧的系统提示词原字节，所以“重启进程”等于“新建逻辑会话”是不成立的。[本地 1139–1142 行](../../hermes-agent/agent/turn_context.py#L1139) · [固定源码](https://github.com/NousResearch/hermes-agent/blob/e31c674f7c523070f48f3baad0650c2fdd7ef6e5/agent/turn_context.py#L1139-L1142) [本地 1166–1173 行](../../hermes-agent/agent/turn_context.py#L1166) · [固定源码](https://github.com/NousResearch/hermes-agent/blob/e31c674f7c523070f48f3baad0650c2fdd7ef6e5/agent/turn_context.py#L1166-L1173) [本地 1346–1354 行](../../hermes-agent/agent/turn_context.py#L1346) · [固定源码](https://github.com/NousResearch/hermes-agent/blob/e31c674f7c523070f48f3baad0650c2fdd7ef6e5/agent/turn_context.py#L1346-L1354) [本地 803–805 行](../../hermes-agent/agent/conversation_loop.py#L803) · [固定源码](https://github.com/NousResearch/hermes-agent/blob/e31c674f7c523070f48f3baad0650c2fdd7ef6e5/agent/conversation_loop.py#L803-L805)
 
 **注释差异与例外：** memory_tool.py 顶部仍用“会话中写盘不改变 prompt”的概括，不能把它扩展成“只能新会话才生效”。普通 live-agent 压缩边界会重建；但 `_retain_seeded_system_prompt=True` 的 detached gateway 压缩代理直接返回旧前缀，避免缩减工具集的后台代理覆盖在线会话。故也不能写成“任何压缩都会刷新记忆”。[本地 1–5 行](../../hermes-agent/tools/memory_tool.py#L1) · [固定源码](https://github.com/NousResearch/hermes-agent/blob/e31c674f7c523070f48f3baad0650c2fdd7ef6e5/tools/memory_tool.py#L1-L5) [本地 3081–3095 行](../../hermes-agent/agent/conversation_compression.py#L3081) · [固定源码](https://github.com/NousResearch/hermes-agent/blob/e31c674f7c523070f48f3baad0650c2fdd7ef6e5/agent/conversation_compression.py#L3081-L3095)
 
@@ -63,7 +63,7 @@ patch 修改匹配条目中的一个跨度并保留其余内容；相同跨度�
 
 工具描述把长期通用事实、用户身份/偏好与任务临时状态分开，并将“应该保存什么”的选择交给模型；程序中的字符串匹配、限额和威胁扫描没有验证用户偏好是否仍有效、事实是否被错误归纳。[本地 373–397 行](../../hermes-agent/tools/memory_tool.py#L373) · [固定源码](https://github.com/NousResearch/hermes-agent/blob/e31c674f7c523070f48f3baad0650c2fdd7ef6e5/tools/memory_tool.py#L373-L397)
 
-**设计推断：** 这些检查分别解决载荷大小、明显注入模式和编辑安全；“通过检查”只能证明它满足这些条件。冲突偏好更新、来源可信与旧条目失效仍需要模型判断、宿主策略和可追溯证据。
+**设计推断：** 这些检查分别解决载荷大小、明显注入模式和编辑安全；“通过检查”只能证明它满足这些条件。冲突偏好更新、来源可信与旧条目失效仍需要模型判断、宿主策略和可追溯的来源。
 
 ## 事实 4：Hermes 的精选 Markdown 与会话数据库并存
 
@@ -71,7 +71,7 @@ patch 修改匹配条目中的一个跨度并保留其余内容；相同跨度�
 
 搜索还区分已压缩归档（active=0, compacted=1）和撤销隐藏（active=0, compacted=0），只有前者按该归档识别路径可找回；不能把“当前上下文里没有了”一律解释为“所有历史都仍可无条件检索”。[本地 206–234 行](../../hermes-agent/tools/session_search_tool.py#L206) · [固定源码](https://github.com/NousResearch/hermes-agent/blob/e31c674f7c523070f48f3baad0650c2fdd7ef6e5/tools/session_search_tool.py#L206-L234)
 
-**设计推断：** 文件精选记忆提供小而常驻的说明，会话数据库提供按需证据查找，两者可以是同一个 Agent 的不同记忆层。以“用了 Markdown”判断“没有检索、没有数据库”会误读这个架构。
+**设计推断：** 文件精选记忆提供小而常驻的说明，会话数据库提供按需历史查找，两者可以是同一个 Agent 的不同记忆层。以“用了 Markdown”判断“没有检索、没有数据库”会误读这个架构。
 
 ## 事实 5：Hermes profile 是默认范围，但不是禁止一切跨 profile 读取的安全声明
 
@@ -141,7 +141,7 @@ session_search 默认打开当前 home 的 state.db；指定 profile 或带 prof
 
 ## 可以直接用于正文的边界表达
 
-| 问题 | 有证据支持的表达 | 不能由这些实现直接推出 |
+| 问题 | 源码支持的表达 | 不能由这些实现直接推出 |
 |---|---|---|
 | 写盘成功是否等于当前记忆块已更新？ | Hermes 普通写入不刷新冻结块；普通 live-agent 压缩重建会重载。OpenClaw 在后续 bootstrap 解析和索引同步边界加载 | 模型当前绝对不知道新事实；任何下一轮、重启或压缩必定立刻刷新 |
 | Markdown 是否意味着没有检索？ | 两个项目都可同时拥有精选 Markdown、会话记录及数据库检索 | 文件方案与数据库方案天然互斥 |
@@ -155,6 +155,6 @@ session_search 默认打开当前 home 的 state.db；指定 profile 或带 prof
 - 用 fake memory 内容记录 Hermes 新会话初始 prompt，写入后比较当前 frozen block，再走普通 live 压缩与 retained-seeded 后台压缩两条路径；分开检查磁盘、缓存、最终 api_messages。
 - 在 OpenClaw 同一长会话里改 USER，捕获下一次 bootstrap；分别测试 4,000 字符 USER 上限、总预算耗尽、个人 USER 超限、group/cron/subagent 与来源 downgrade。
 - 写入可识别标记，记录文件完成、index sync 完成、memory_search 返回和模型请求含该标记的四个时间点，核对索引滞后，避免把未检索到误判为没保存。
-- 用固定候选和 fake consolidation 输出测试错误来源、自由生成 resultEntry、无证据替代、并发外部修改、预算不足与 append-only 回退，核对源文件与旧内容是否仍可追溯。
+- 用固定候选和 fake consolidation 输出测试错误来源、自由生成 resultEntry、缺少原文依据的替代、并发外部修改、预算不足与 append-only 回退，核对源文件与旧内容是否仍可追溯。
 
 本研究没有测量准确率、延迟、压缩后遵循偏好的成功率，也未验证真实多 profile 部署的全部权限边界。

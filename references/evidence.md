@@ -1,18 +1,24 @@
-# 证据索引与研究边界
+# 参考资料与研究范围
 
 核对日期：2026-10-17。固定版本来自 [SOURCES.json](../SOURCES.json)。本地链接便于阅读，固定提交链接用于之后复核。
 
-第一轮核对代表项目的官方材料；第二轮增加局部执行链、默认配置和异常路径的源码研究。README 证明项目如何描述自身，实际行为仍以所引用的固定实现和配置为准。
+这里保留正文采用的项目材料、源码研究与实验入口。README 说明项目如何描述自身，实际行为以所引用的固定实现和配置为准；局部机制与完整任务效果分别讨论。
 
-本轮实际运行了一组 LangGraph 机制实验，其余新研究为静态核对，包含阅读上游测试但没有运行这些测试。未运行跨项目评测。
+已运行实验包含五组、共 31 个确定性场景，覆盖 LangGraph 恢复与工具边界、SDK 委派预算、Pi 摘要输入，以及本书的离线验收规则。没有运行外网模型、真实业务服务、上游测试或跨项目任务评测。
 
 ## 深入研究与实际实验
 
 - [Pi 与 Deep Agents](studies/pi-deepagents-execution.md)：工具批次、插话边界、上下文投影、默认装配、文件冲突与子任务状态。
-- [Codex](studies/codex-tool-execution.md)：命令策略、审批、沙箱尝试与 MCP 调用，限定入口和平台证据范围。
+- [Codex](studies/codex-tool-execution.md)：命令策略、审批、沙箱尝试与 MCP 调用，结论限定于所追踪的入口和平台。
 - [LangGraph](studies/langgraph-interrupt-resume.md)：中断与节点重入的实现，并附 [四个已运行场景](../experiments/README.md) 和 [原始结果](../experiments/results/langgraph-interrupt-replay.json)。
 - [Hermes 与 OpenClaw](studies/openclaw-hermes-memory.md)：记忆写入、运行缓存、请求加载、索引与后台整理的不同边界。
 - [Goose 与 Cline SDK](studies/goose-cline-mcp.md)：MCP 工具目录、名称路由、审批、结果缓存与错误包装。Cline 的结论限定为研究的 SDK 路径。
+- [工具结果与重试](studies/tool-results-and-retries.md)：LangChain Core 的工具包装、LangGraph 的错误转换、整批调度与节点重试。
+- [上下文压缩](studies/context-compaction.md)：Pi 的切点、摘要前裁剪、原始记录，以及 Hermes 的前缀刷新。
+- [委派与交接](studies/delegation-and-handoffs.md)：SDK 与 Deep Agents 的控制转移、输入传递、子运行和结果汇总。
+- [工具内容与信任](studies/trust-and-tool-content.md)：MCP 注解、Codex 目录快照与 Cline 临时缓存各自的保证。
+- [执行预算](studies/execution-budgets.md)：模型轮数、子运行、请求尝试、图步数和并发上限的不同计数范围。
+- [验收与评测](studies/evaluation-and-evidence.md)：原始 SWE-bench 与 τ-bench 的任务、判定条件和重复可靠性。未运行这两个基准。
 
 各记录给出本地文件与固定提交引用。正文采用其中能够解释设计取舍的部分；记录末尾的待实测事项不作为实验结论。
 
@@ -24,9 +30,11 @@
 
 ## P02 Pi 的会话与压缩
 
-材料支持：运行系统组织模型、工具、上下文和会话；活动分支提供历史，压缩以摘要替代后续请求中的部分历史，原始条目仍保留；Skill 完整说明按需加载。未实测压缩后的信息保留率。
+材料支持：运行系统组织模型、工具、上下文和会话；活动分支提供历史，压缩以摘要替代后续请求中的部分历史，原始条目仍保留；Skill 完整说明按需加载。
 
 第二轮进一步区分原始会话树、有效上下文投影与实际模型输入，见 [执行与投影研究](studies/pi-deepagents-execution.md)。
+
+摘要输入研究又追踪单条工具结果的裁剪，运行四个受控输入观察实际序列化结果。没有调用摘要模型，也没有测量端到端的信息保留率。[压缩研究](studies/context-compaction.md) · [四场景记录](../experiments/results/pi-summary-input.json)
 
 - [运行过程](../pi/packages/coding-agent/docs/how-pi-works.md) · [固定提交](https://github.com/earendil-works/pi/blob/8efd314fa3d3232ce197d8d7a6a5660530b9d83e/packages/coding-agent/docs/how-pi-works.md)
 - [会话与上下文](../pi/packages/coding-agent/docs/sessions.md) · [固定提交](https://github.com/earendil-works/pi/blob/8efd314fa3d3232ce197d8d7a6a5660530b9d83e/packages/coding-agent/docs/sessions.md)
@@ -44,6 +52,8 @@
 材料支持：项目关注长期、有状态的执行；检查点表示执行状态，Store 提供跨线程与会话的长期存储接口。本文没有声称检查点能自动撤销外部副作用。
 
 第二轮沿中断和恢复源码核对节点重入，并实际观察四个受控场景。检查点采用内存实现，同进程恢复；不覆盖真实服务事务、网络故障或进程崩溃。[机制记录](studies/langgraph-interrupt-resume.md) · [复现与结果](../experiments/README.md)
+
+工具研究另运行九个同步场景，比较错误消息、异常传播、节点重试与图步数；业务服务为进程内模拟对象。异步调度、网络故障与真实模型如何使用错误反馈仍待观察。[工具研究](studies/tool-results-and-retries.md) · [九场景记录](../experiments/results/langgraph-tool-boundaries.json)
 
 - [项目说明](../langgraph/README.md) · [固定提交](https://github.com/langchain-ai/langgraph/blob/41c9c22fdc83d68a2859d0c9a2b627c8615a792f/README.md)
 - [检查点定义](../langgraph/libs/checkpoint/langgraph/checkpoint/base/__init__.py) · [固定提交](https://github.com/langchain-ai/langgraph/blob/41c9c22fdc83d68a2859d0c9a2b627c8615a792f/libs/checkpoint/langgraph/checkpoint/base/__init__.py)
@@ -95,7 +105,9 @@
 
 ## S02 OpenAI Agents SDK 的协作概念
 
-材料支持：项目材料同时列出 agents-as-tools 与 handoffs，以及会话、追踪与人工介入等概念。本文没有枚举或评测其全部运行入口。
+材料支持：项目材料同时列出 agents-as-tools 与 handoffs。源码进一步区分三个 Runner 启动入口、工具式委派的嵌套运行，以及交接在同一次运行里更换执行者的流程。
+
+五个预编排模型场景实际观察了委派、交接与轮数计数。它们没有调用外网模型，也没有验证真实模型的分工质量。会话后端、所有扩展与取消路径不在本轮完整覆盖范围内。[协作研究](studies/delegation-and-handoffs.md) · [预算研究](studies/execution-budgets.md) · [运行记录](../experiments/results/agents-delegation-budgets.json)
 
 - [项目说明](../openai-agents-python/README.md) · [固定提交](https://github.com/openai/openai-agents-python/blob/9abc9182d06dbd28330af888306031269d57a175/README.md)
 
@@ -118,9 +130,12 @@
 - [ReAct 原始论文](https://arxiv.org/abs/2210.03629)：推理与行动交替组织的研究来源。
 - [MCP 架构](https://modelcontextprotocol.io/docs/learn/architecture)：宿主、客户端与服务端的关系。
 - [MCP 工具规范（2025-11-25）](https://modelcontextprotocol.io/specification/2025-11-25/server/tools)：工具发现、调用与输入结果结构。
+- [MCP 架构规范（2025-11-25）](https://modelcontextprotocol.io/specification/2025-11-25/architecture)：协议角色与宿主职责。
 - [LangGraph 持久化](https://docs.langchain.com/oss/python/langgraph/persistence)：检查点与执行恢复的官方说明。
 - [LangChain 记忆概述](https://docs.langchain.com/oss/python/concepts/memory)：短期与长期信息的官方概念说明。
 - [OpenAI 官方安全文档](https://learn.chatgpt.com/docs/security)：原 Codex security 链接重定向到的当前页面；本文的具体实现论断仍以 C01 固定源码为准。
+- [SWE-bench 原始论文 v1](https://arxiv.org/abs/2310.06770v1)：修复问题与保持原有行为的验收结构。
+- [τ-bench 原始论文 v1](https://arxiv.org/abs/2406.12045v1)：交互后的状态、必要回复，以及多次尝试与重复可靠性的不同口径。
 
 ## 下一轮研究应当产生什么
 

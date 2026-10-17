@@ -73,4 +73,4 @@
 
 ## 首轮阅读补充
 
-Letta 当前主分支主要是迁移入口，README 指向 `letta-ai/letta-code`；这份新实现尚未下载。本地 `letta/` 保留原快照，不能直接当作完整当前运行内核。OpenHands 当前主仓库介绍 Agent Canvas，实际任务由可选 Agent 后端执行。详见 [证据范围](../references/evidence.md)。
+Letta 当前主分支主要是迁移入口，README 指向 `letta-ai/letta-code`；这份新实现尚未下载。本地 `letta/` 保留原快照，不能直接当作完整当前运行内核。OpenHands 当前主仓库介绍 Agent Canvas，实际任务由可选 Agent 后端执行。详见 [研究范围](../references/evidence.md)。

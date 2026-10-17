@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "experiments": [
+    {
+      "id": "langgraph-interrupt-replay",
+      "script": "experiments/langgraph_interrupt_replay.py",
+      "result": "experiments/results/langgraph-interrupt-replay.json",
+      "kind": "framework-mechanism",
+      "case_count": 4,
+      "dependency_locks": [
+        "experiments/dependencies.lock"
+      ]
+    },
+    {
+      "id": "langgraph-tool-boundaries",
+      "script": "experiments/langgraph_tool_boundaries.py",
+      "result": "experiments/results/langgraph-tool-boundaries.json",
+      "kind": "framework-mechanism",
+      "case_count": 9,
+      "dependency_locks": [
+        "experiments/dependencies.lock"
+      ]
+    },
+    {
+      "id": "agents-delegation-budgets",
+      "script": "experiments/agents_delegation_budgets.py",
+      "result": "experiments/results/agents-delegation-budgets.json",
+      "kind": "scripted-model-mechanism",
+      "case_count": 5,
+      "dependency_locks": [
+        "experiments/agents-sdk-dependencies.lock"
+      ]
+    },
+    {
+      "id": "pi-summary-input",
+      "script": "experiments/pi_summary_input.mjs",
+      "result": "experiments/results/pi-summary-input.json",
+      "kind": "source-function",
+      "case_count": 4,
+      "dependency_locks": []
+    },
+    {
+      "id": "task-acceptance",
+      "script": "experiments/task_acceptance.py",
+      "result": "experiments/results/task-acceptance.json",
+      "kind": "application-validator",
+      "case_count": 9,
+      "dependency_locks": []
+    }
+  ]
+}

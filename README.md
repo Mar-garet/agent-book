@@ -21,6 +21,7 @@
 3. [理解长期工作中的取舍](book/07-planning-and-methods.md)：规划、Skills 与多 Agent 怎样改变执行过程，又带来哪些成本。
 4. [形成自己的判断](book/10-project-comparisons.md)：把不同项目放在同一组问题下比较，再回到真实任务的系统设计。
 5. [沿真实机制深入](book/12-action-boundaries.md)：追踪动作边界、默认装配、恢复副作用、记忆更新与 MCP 宿主差异。
+6. [从局部动作走向完整交付](book/17-tool-results-and-retries.md)：理解工具重试、压缩损失、委派、信任边界、预算与验收。
 
 [查看完整目录](book/README.md)
 
@@ -32,13 +33,13 @@
 
 ## 研究资料
 
-正文中的设计判断可以沿 [证据索引](references/evidence.md) 回到固定版本的实现。完整调用链保存在 [源码研究记录](references/studies/README.md)，已运行的场景保存在 [实验与复现](experiments/README.md)。
+正文中的设计判断可以沿 [参考资料](references/evidence.md) 回到固定版本的实现。完整调用链保存在 [源码研究记录](references/studies/README.md)，已运行的场景保存在 [实验与复现](experiments/README.md)。
 
 全部收录项目及版本见 [源码目录](docs/source-catalog.md)，概念说明见 [术语表](references/glossary.md)。
 
 ## 当前进度
 
-书稿仍在完善，目前有 17 篇正文。源码研究覆盖部分项目；LangGraph 的四个中断与恢复场景已有运行记录，跨项目的任务成功率、性能与成本评测仍待开展。
+书稿仍在完善，目前有 23 篇正文。部分机制配有源码研究与可复现实验，覆盖恢复、工具重试、委派预算、摘要输入和离线验收。跨项目的任务成功率、性能与成本评测仍待开展。
 
 <details>
 <summary>阅读界面预览</summary>
@@ -49,7 +50,7 @@
 
 ## 参与和使用
 
-欢迎通过 [Issue](https://github.com/Mar-garet/agent_book/issues) 提出问题或纠错。补充项目机制时，请附具体版本、配置条件与证据；写作方法见 [研究约定](docs/editorial-guide.md)。
+欢迎通过 [Issue](https://github.com/Mar-garet/agent_book/issues) 提出问题或纠错。补充项目机制时，请附具体版本、配置条件与出处；写作方法见 [研究约定](docs/editorial-guide.md)。
 
 本地打开阅读站见 [使用说明](website/README.md)。上游源码作为 Git 子模块保存，可在克隆本仓库后按需下载：
 

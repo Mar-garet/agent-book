@@ -114,20 +114,41 @@ def main() -> None:
                 for line in staged.splitlines() if line.startswith('160000 ')}
     if gitlinks != {item['directory']: item['commit'] for item in repositories.values()}:
         errors.append('Git submodule pointers do not match SOURCES.json')
-    report_path = root / 'experiments/results/langgraph-interrupt-replay.json'
-    if report_path.exists():
-        report = json.loads(read(report_path))
-        script = root / 'experiments/langgraph_interrupt_replay.py'
+    experiments = json.loads(read(root / 'experiments/manifest.json'))['experiments']
+    experiment_cases = 0
+    for experiment in experiments:
+        label = experiment['id']
+        paths = [experiment['script'], experiment['result'], *experiment['dependency_locks']]
+        if any(not path.startswith('experiments/') or '..' in Path(path).parts for path in paths):
+            errors.append('Invalid experiment attachment path: ' + label)
+            continue
+        missing = [path for path in paths if not (root / path).is_file()]
+        if missing:
+            errors.append('Missing experiment files: ' + ', '.join(missing))
+            continue
+        report = json.loads(read(root / experiment['result']))
+        script = root / experiment['script']
+        if report['experiment'] != label:
+            errors.append('Experiment identity does not match the manifest: ' + label)
         if report['script_sha256'] != sha256(script.read_bytes()).hexdigest():
-            errors.append('Experiment record does not match the current experiment script')
+            errors.append('Experiment record does not match the current script: ' + label)
+        count = len(report['cases'])
+        experiment_cases += count
+        if not count or count != experiment['case_count']:
+            errors.append('Experiment case count does not match the manifest: ' + label)
         for directory, commit in report['source_commits'].items():
-            if repositories[directory]['commit'] != commit:
+            if directory not in repositories or repositories[directory]['commit'] != commit:
                 errors.append('Experiment source snapshot changed: ' + directory)
+        for path, digest in report.get('source_file_sha256', {}).items():
+            source = source_root / path
+            if not source.is_file() or sha256(source.read_bytes()).hexdigest() != digest:
+                errors.append('Experiment source file changed: ' + path)
     for error in errors:
         print('ERROR:', error)
     print(json.dumps({
         'markdown_files': len(files), 'local_links': links_checked,
         'fixed_source_citations': citations_checked,
+        'experiment_groups': len(experiments), 'experiment_cases': experiment_cases,
         'source_snapshots': len(repositories), 'errors': len(errors),
     }))
     raise SystemExit(bool(errors))

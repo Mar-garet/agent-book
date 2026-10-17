@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
-test('search opens a chapter, follows its evidence and preserves browser navigation', async ({ page }) => {
+test('search opens a chapter, follows its sources and preserves browser navigation', async ({ page }) => {
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto('/');
@@ -50,6 +50,35 @@ test('the public reader serves manuscripts and experiment records without GitHub
   expect(results.ok()).toBe(true);
   expect((await results.json()).cases).toHaveLength(4);
   await expect(page.getByRole('link', { name: '作者 GitHub' })).toHaveAttribute('href', 'https://github.com/Mar-garet');
+});
+
+test('later chapters remain connected and all experiment attachments are public', async ({ page }) => {
+  await page.goto('/?read=book%2F16-mcp-host-differences');
+  await page.locator('.next-chapter').click();
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('工具返回了，任务为什么还没有完成？');
+  await expect(page.locator('.diagram-image svg')).toBeVisible();
+  for (const title of ['摘要更短了，Agent 为什么反而忘了关键事实？', '叫来更多 Agent，为什么还要有人收尾？']) {
+    await page.locator('.next-chapter').click();
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(title);
+    await expect(page.locator('.diagram-image svg')).toBeVisible();
+  }
+  await page.goto('/?read=book%2F22-evaluation-and-completion');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('谁来证明 Agent 真的完成了？');
+  await expect(page.locator('.prose a').filter({ hasText: '离线验收记录' })).toHaveAttribute('href', './downloads/experiments/results/task-acceptance.json');
+  const manifestResponse = await page.request.get('/downloads/experiments/manifest.json');
+  expect(manifestResponse.ok()).toBe(true);
+  const manifest = await manifestResponse.json();
+  expect(manifest.experiments).toHaveLength(5);
+  for (const experiment of manifest.experiments) {
+    const result = await page.request.get(`/downloads/${experiment.result}`);
+    expect(result.ok()).toBe(true);
+    expect((await result.json()).cases).toHaveLength(experiment.case_count);
+    for (const file of [experiment.script, ...experiment.dependency_locks]) {
+      const response = await page.request.get(`/downloads/${file}`);
+      expect(response.ok()).toBe(true);
+      expect(await response.text()).not.toContain('<!doctype html>');
+    }
+  }
 });
 
 test('theme and reading size survive a reload and Escape returns search focus', async ({ page }) => {
