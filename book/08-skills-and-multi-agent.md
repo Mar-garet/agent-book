@@ -30,7 +30,7 @@ Hermes 将记忆、历史搜索和技能积累放在持续使用的设计中。�
 
 给模型写上“研究员”“审查员”可以改变任务提示。实际权限仍需要工具和运行环境分别配置。
 
-“隔离”也需要说清对象。Deep Agents 的一个默认子调用路径替换了父消息历史，却仍可传入文件等未被排除的状态，并回传允许的工作数据。[第十三章](13-context-and-defaults.md) 说明这种上下文边界为何不等于所有资源和权限都已隔离。
+“隔离”也需要说清对象。Deep Agents 的一个默认子调用路径替换了父消息历史，却仍可传入文件等未被排除的状态，并回传允许的工作数据。[上下文装配专题](13-context-and-defaults.md) 说明这种上下文边界为何不等于所有资源和权限都已隔离。
 
 ## 委派与交接，控制权怎样转移
 
@@ -38,7 +38,7 @@ Hermes 将记忆、历史搜索和技能积累放在持续使用的设计中。�
 
 交接时，后续处理转到另一个 Agent，由它承担新的对话或工作职责。交接需要传递目标、已知信息、约束和已经发生的动作。
 
-OpenAI Agents SDK 同时提供 agents-as-tools 与 handoffs，分别组织工具式委派与交接。[第十九章](19-delegation-and-handoffs.md) 会沿固定实现说明控制与输入怎样转移；[第二十一章](21-execution-budgets.md) 再用实际场景比较它们的轮数范围。[参考 S02](../references/evidence.md#s02-openai-agents-sdk-的协作概念)
+OpenAI Agents SDK 同时提供 agents-as-tools 与 handoffs，分别组织工具式委派与交接。[协作系统专题](19-delegation-and-handoffs.md) 会沿固定实现说明控制与输入怎样转移；[执行预算专题](21-execution-budgets.md) 再用实际场景比较它们的轮数范围。[参考 S02](../references/evidence.md#s02-openai-agents-sdk-的协作概念)
 
 ## 并行带来的收益，需要减去协调成本
 

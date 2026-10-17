@@ -10,20 +10,29 @@ const comparison = await readFile(join(root, 'book/10-project-comparisons.md'), 
 const phases = [];
 let phase;
 for (const line of index.split('\n')) {
-  const heading = line.match(/^## 第.+阶段：(.+)$/);
+  const heading = line.match(/^## (第.+阶段|专题[一二三四五六七八九十]+)：(.+)$/);
   if (heading) {
-    phase = { title: heading[1], chapters: [] };
+    phase = { title: heading[2], kind: heading[1].startsWith('专题') ? 'topic' : 'foundation', description: '', chapters: [] };
     phases.push(phase);
   }
-  const item = line.match(/^(\d+)\. \[([^\]]+)\]\(([^)]+)\)[—\s]*(.*)$/);
+  if (line.startsWith('## ') && !heading) phase = undefined;
+  const item = line.match(/^(?:(\d+)\.|-) \[([^\]]+)\]\(([^)]+)\)[—\s]*(.*)$/);
+  if (phase && !phase.description && line.trim() && !line.startsWith('#') && !item) phase.description = line.trim();
   if (item && phase) {
     phase.chapters.push({
-      number: Number(item[1]), title: item[2],
+      number: item[1] ? Number(item[1]) : Number(item[3].match(/^\d+/)?.[0]), title: item[2],
       id: `book/${item[3].replace(/\.md$/, '')}`, description: item[4],
     });
   }
 }
 if (!phases.length) throw new Error('Book reading phases were not found');
+const chapterIds = phases.flatMap((item) => item.chapters.map((chapter) => chapter.id));
+if (new Set(chapterIds).size !== chapterIds.length) throw new Error('Duplicate chapter in reading route');
+for (const file of await readdir(join(root, 'book'))) {
+  if (/^\d+.*\.md$/.test(file) && !chapterIds.includes(`book/${file.replace(/\.md$/, '')}`)) {
+    throw new Error(`Chapter missing from reading route: ${file}`);
+  }
+}
 
 async function markdownFiles(directory) {
   const files = [];

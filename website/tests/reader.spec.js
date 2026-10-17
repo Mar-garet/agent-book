@@ -57,7 +57,7 @@ test('the public reader serves manuscripts and experiment records without GitHub
   await expect(manuscript).toHaveAttribute('href', './manuscript/book/14-resume-and-side-effects.md');
   const raw = await page.request.get('/manuscript/book/14-resume-and-side-effects.md');
   expect(raw.ok()).toBe(true);
-  expect(await raw.text()).toContain('# 第十四章');
+  expect(await raw.text()).toContain('# 从断点继续，为什么会再做一遍？');
   await expect(page.locator('.prose a').filter({ hasText: '原始结果' })).toHaveAttribute('href', './downloads/experiments/results/langgraph-interrupt-replay.json');
   const results = await page.request.get('/downloads/experiments/results/langgraph-interrupt-replay.json');
   expect(results.ok()).toBe(true);
@@ -70,10 +70,10 @@ test('later chapters remain connected and all experiment attachments are public'
   await page.locator('.next-chapter').click();
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('工具返回了，任务为什么还没有完成？');
   await expect(page.locator('.diagram-image svg')).toBeVisible();
-  for (const title of ['摘要更短了，Agent 为什么反而忘了关键事实？', '叫来更多 Agent，为什么还要有人收尾？']) {
+  for (const title of ['叫来更多 Agent，为什么还要有人收尾？', '用户说了停，动作为什么还在发生？']) {
     await page.locator('.next-chapter').click();
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(title);
-    await expect(page.locator('.diagram-image svg')).toBeVisible();
+    await expect(page.locator('.prose h2').first()).toBeVisible();
   }
   await page.goto('/?read=book%2F22-evaluation-and-completion');
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('谁来证明 Agent 真的完成了？');
@@ -158,3 +158,50 @@ test('home and reader pass automated accessibility checks in light and dark them
     await page.screenshot({ path: `test-results/reader-${theme}.png` });
   }
 });
+
+
+test('contents separates foundations and system topics without losing or duplicating chapters', async ({ page }) => {
+  await page.goto('/?page=contents');
+  await expect(page.locator('.contents-part')).toHaveCount(2);
+  await expect(page.locator('.contents-part').last()).toContainText('专题篇');
+  await expect(page.locator('.contents-chapter')).toHaveCount(23);
+  const hrefs = await page.locator('.contents-chapter').evaluateAll((links) => links.map((link) => link.getAttribute('href')));
+  expect(new Set(hrefs).size).toBe(23);
+  await page.locator('.contents-chapter').filter({ hasText: '记忆系统：从项目比较' }).click();
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('记忆系统：从项目比较到写入、检索与更新');
+  await expect(page.locator('.article-meta')).toContainText('系统专题');
+  await expect(page.locator('.article-meta')).not.toContainText('第 15 章');
+  await page.locator('.next-chapter').click();
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('默认能力，是怎样被装配出来的？');
+  await page.locator('.next-chapter').click();
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('摘要更短了，Agent 为什么反而忘了关键事实？');
+});
+
+for (const width of [375, 1440]) {
+  for (const theme of ['light', 'dark']) {
+    test(`memory topic diagrams, callouts and comparison tables render at ${width}px in ${theme}`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 1000 });
+      await page.goto('/');
+      await page.evaluate((value) => localStorage.setItem('agent-book-theme', JSON.stringify(value)), theme);
+      await page.goto('/?read=book%2F15-memory-update-boundaries');
+      await expect(page.locator('.diagram-image svg')).toHaveCount(2);
+      await expect(page.locator('.reading-callout')).toHaveCount(2);
+      await expect(page.locator('.reading-callout').first()).toContainText('阅读提示');
+      await expect(page.locator('.prose')).not.toContainText('[!NOTE]');
+      await expect(page.locator('.prose')).not.toContainText('**');
+      const comparison = page.locator('.table-scroll').first();
+      await expect(comparison.locator('th')).toHaveText(['比较维度', 'Hermes', 'OpenClaw', 'LangGraph']);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+      const findings = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze();
+      expect(findings.violations.map(({ id }) => id)).toEqual([]);
+      await page.locator('.diagram').first().evaluate((element) => element.scrollIntoView({ block: 'start' }));
+      await page.screenshot({ path: `test-results/memory-${width}-${theme}.png` });
+      await comparison.scrollIntoViewIfNeeded();
+      await page.screenshot({ path: `test-results/memory-comparison-${width}-${theme}.png` });
+      const diagram = page.locator('.diagram').first();
+      await diagram.getByRole('button', { name: '放大图表' }).click();
+      await expect(diagram.getByRole('button', { name: '适应宽度' })).toHaveAttribute('aria-pressed', 'true');
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    });
+  }
+}

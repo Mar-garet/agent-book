@@ -81,4 +81,4 @@ flowchart TD
 
 这样，项目越读越多，书的主线也会越来越清楚。读者最终掌握的是一组能反复使用的问题：模型看见什么，谁决定动作，谁承担后果，依据什么继续，凭什么结束。
 
-[上一章](10-project-comparisons.md) · [下一章：用户说了停，动作为什么还在发生？](12-action-boundaries.md)
+[上一章：把项目放在同一张问题地图上](10-project-comparisons.md) · [下一章：记忆系统：从项目比较到写入、检索与更新](15-memory-update-boundaries.md)

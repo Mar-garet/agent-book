@@ -411,3 +411,32 @@ dialog::backdrop { background: rgb(28 30 24 / .34); backdrop-filter: blur(3px); 
   .table-scroll { overflow: visible; }
   .prose a { color: inherit; }
 }
+
+/* System topics keep the reading hierarchy visible without crowding the prose. */
+.nav-part { margin: 26px 12px 14px; padding-top: 18px; border-top: 1px solid var(--line); color: var(--ink); font-size: 12px; font-weight: 600; }
+.nav-phase:first-child .nav-part { margin-top: 0; padding-top: 0; border-top: 0; }
+.contents-part { padding: 48px 0 24px; }
+.contents-part h2 { margin: 12px 0; font: 500 28px/1.5 'Songti SC', 'STSong', serif; }
+.contents-part p, .contents-phase-description { color: var(--secondary); font-size: 14px; line-height: 1.9; max-width: 650px; }
+.contents-phase-description { margin: -4px 0 20px; }
+.prose .reading-callout { border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 0 8px 8px 0; padding: 20px 24px; background: var(--feature); color: var(--ink); }
+.prose .callout-label { margin-bottom: 10px; color: var(--accent); font-size: .8em; font-weight: 600; letter-spacing: .06em; }
+.prose .reading-callout[data-callout='note'] { border-left-color: var(--secondary); }
+.prose .reading-callout[data-callout='note'] .callout-label { color: var(--secondary); }
+.diagram figcaption { display: flex; align-items: baseline; gap: 12px; margin-bottom: 24px; color: var(--ink); font-size: .85em; font-weight: 600; line-height: 1.7; }
+.diagram figcaption span { flex-shrink: 0; color: var(--accent); font-size: .85em; }
+.prose tbody tr:nth-child(even) { background: var(--feature); }
+.diagram-image:focus-visible, .prose pre:focus-visible, .table-scroll:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+@media (max-width: 600px) {
+  .contents-part { padding-top: 32px; }
+  .contents-part h2 { font-size: 23px; }
+  .contents-phase-description { font-size: 13px; }
+  .prose .reading-callout { padding: 16px; }
+  .diagram { padding: 14px; }
+  .diagram figcaption { gap: 8px; }
+}
+
+.diagram-controls { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: -12px 0 16px; color: var(--secondary); font-size: 12px; }
+.diagram-controls button { min-height: 44px; padding: 8px 12px; background: var(--surface); border: 1px solid var(--line); }
+.diagram-controls button:hover { border-color: var(--accent); color: var(--accent); }
+.diagram-expanded .diagram-image svg { min-width: 680px; }

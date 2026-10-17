@@ -1,4 +1,4 @@
-# 第十九章：叫来更多 Agent，为什么还要有人收尾？
+# 叫来更多 Agent，为什么还要有人收尾？
 
 本章比较两种协作关系，主要案例的应用运行入口实际有三个：异步运行、同步运行和流式运行。委派与交接是这些运行里的组织方式，不是两个额外的应用启动入口。实验只走异步运行入口，对照另一项目时也只研究它的一条子任务工具路径。
 
@@ -80,7 +80,7 @@ Deep Agents 提供了另一条对照路径：模型通过一个 `task` 工具选
 
 这些工作有成本。并行可以缩短独立阅读的等待时间，协调者却仍要花资源核查、整合与补查。只有把这些工作算进完整任务，才能判断分工是否值得。
 
-协作最终扩大的是信息与动作的流动范围。接收一份子报告时，系统不仅要知道它说了什么，还要知道这段内容能影响哪些决定。这个问题把我们带到下一章的信任边界。
+协作最终扩大的是信息与动作的流动范围。接收一份子报告时，系统不仅要知道它说了什么，还要知道这段内容能影响哪些决定。这个问题会在[信任边界专题](20-trust-boundaries.md)继续展开。
 
 [^entry]: [本地异步入口](../openai-agents-python/src/agents/run.py#L279-L324) · [固定源码](https://github.com/openai/openai-agents-python/blob/9abc9182d06dbd28330af888306031269d57a175/src/agents/run.py#L279-L324)；[同步入口](https://github.com/openai/openai-agents-python/blob/9abc9182d06dbd28330af888306031269d57a175/src/agents/run.py#L385-L407)；[流式入口](https://github.com/openai/openai-agents-python/blob/9abc9182d06dbd28330af888306031269d57a175/src/agents/run.py#L488-L509)；完整职责划分见 [研究记录](../references/studies/delegation-and-handoffs.md)。
 [^input]: [本地 Agent 工具包装](../openai-agents-python/src/agents/agent.py#L606-L667) · [固定源码](https://github.com/openai/openai-agents-python/blob/9abc9182d06dbd28330af888306031269d57a175/src/agents/agent.py#L606-L667)；[共享对象与子运行配置](https://github.com/openai/openai-agents-python/blob/9abc9182d06dbd28330af888306031269d57a175/src/agents/agent.py#L746-L773)；应用上下文与会话区别见 [研究记录](../references/studies/delegation-and-handoffs.md#先区分执行者输入与基础设施)。
@@ -89,4 +89,4 @@ Deep Agents 提供了另一条对照路径：模型通过一个 `task` 工具选
 [^handoff]: [本地交接后切换当前 Agent](../openai-agents-python/src/agents/run.py#L2386-L2408) · [固定源码](https://github.com/openai/openai-agents-python/blob/9abc9182d06dbd28330af888306031269d57a175/src/agents/run.py#L2386-L2408)；历史过滤与参数关系见 [研究记录](../references/studies/delegation-and-handoffs.md)。
 [^failure]: [本地默认工具错误文本](../openai-agents-python/src/agents/tool.py#L1997-L2002) · [固定源码](https://github.com/openai/openai-agents-python/blob/9abc9182d06dbd28330af888306031269d57a175/src/agents/tool.py#L1997-L2002)；[实际五场景记录](../experiments/results/agents-delegation-budgets.json) 与 [实验脚本](../experiments/agents_delegation_budgets.py)。
 
-[上一章：上下文压缩](18-context-compaction.md) · [下一章：信任边界](20-trust-boundaries.md)
+[上一章：工具返回了，任务为什么还没有完成？](17-tool-results-and-retries.md) · [下一章：用户说了停，动作为什么还在发生？](12-action-boundaries.md)

@@ -1,4 +1,4 @@
-# 第十八章：摘要更短了，Agent 为什么反而忘了关键事实？
+# 摘要更短了，Agent 为什么反而忘了关键事实？
 
 本章主线统计一个由宿主主动调用的会话压缩入口；自动触发属于会话内部的另一条调用路径。对照案例另统计一个本地压缩协调入口。这里数的是协调一次压缩的入口，准备数据、摘要生成器与存储组件不另计。
 
@@ -66,7 +66,7 @@ Pi 的默认摘要序列化器对每条工具结果设置了长度限制：只�
 
 一种应用设计是把持续生效的约束与一般工作叙述分开保存：适用环境、允许动作、规则生效时间由明确字段和执行检查承载；背景、假设与尝试过程可以有损整理。这样做增加了结构维护成本，但能让部分关键状态不依赖多次自由转述。
 
-这不是说摘要应当代替授权记录。相反，模型输入里的限制帮助它选择动作，执行器仍要依据当前规则判断动作能否发生。[第二十章](20-trust-boundaries.md) 会继续区分这两层责任。
+这不是说摘要应当代替授权记录。相反，模型输入里的限制帮助它选择动作，执行器仍要依据当前规则判断动作能否发生。[信任边界专题](20-trust-boundaries.md) 会继续区分这两层责任。
 
 ## 原文回查，需要一条走得通的路径
 
@@ -94,7 +94,7 @@ Hermes 的对照范围是一个本地压缩协调入口 `compress_context(...)`�
 
 因此，观察位置应该落在状态变化上：选中了哪些条目，生成了什么候选摘要，是否追加了压缩记录，最终请求采用了哪个边界。用户看见的提示是过程的一部分，不是全部过程。
 
-经过压缩，一个 Agent 需要保住的是继续做事所需的依据。下一章把这个问题向外推进：这些依据如果要交给另一个 Agent，谁决定传什么，谁还负责最后的交付？
+经过压缩，一个 Agent 需要保住的是继续做事所需的依据。[协作系统专题](19-delegation-and-handoffs.md)把这个问题向外推进：这些依据如果要交给另一个 Agent，谁决定传什么，谁还负责最后的交付？
 
 [^entry]: [本地主动入口](../pi/packages/coding-agent/src/core/agent-session.ts#L2779-L2810) · [固定源码](https://github.com/earendil-works/pi/blob/8efd314fa3d3232ce197d8d7a6a5660530b9d83e/packages/coding-agent/src/core/agent-session.ts#L2779-L2810)；[扩展与提交顺序](https://github.com/earendil-works/pi/blob/8efd314fa3d3232ce197d8d7a6a5660530b9d83e/packages/coding-agent/src/core/agent-session.ts#L2807-L2880)。
 [^selection]: [本地压缩准备](../pi/packages/coding-agent/src/core/compaction/compaction.ts) · [完整研究与切点分析](../references/studies/context-compaction.md)；[默认预算与触发](https://github.com/earendil-works/pi/blob/8efd314fa3d3232ce197d8d7a6a5660530b9d83e/packages/coding-agent/src/core/compaction/compaction.ts#L120-L130)。
@@ -105,4 +105,4 @@ Hermes 的对照范围是一个本地压缩协调入口 `compress_context(...)`�
 [^refresh]: [本地前缀刷新](../hermes-agent/agent/conversation_compression.py#L3081-L3125) · [固定源码](https://github.com/NousResearch/hermes-agent/blob/e31c674f7c523070f48f3baad0650c2fdd7ef6e5/agent/conversation_compression.py#L3081-L3125)；[提交前调用](https://github.com/NousResearch/hermes-agent/blob/e31c674f7c523070f48f3baad0650c2fdd7ef6e5/agent/conversation_compression.py#L4252-L4265)。
 [^commit]: [本地追加与刷新](../pi/packages/coding-agent/src/core/agent-session.ts#L2845-L2880) · [固定源码](https://github.com/earendil-works/pi/blob/8efd314fa3d3232ce197d8d7a6a5660530b9d83e/packages/coding-agent/src/core/agent-session.ts#L2845-L2880)；适用条件见 [压缩研究](../references/studies/context-compaction.md)。
 
-[上一章：工具结果](17-tool-results-and-retries.md) · [下一章：委派与交接](19-delegation-and-handoffs.md)
+[上一章：默认能力，是怎样被装配出来的？](13-context-and-defaults.md) · [下一章：同一个 MCP 服务，为什么进入两个 Agent 后表现不同？](16-mcp-host-differences.md)

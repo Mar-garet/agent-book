@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeSlug from 'rehype-slug';
+import readingBlocks from './reading-blocks';
 import {
   ArrowDown, ArrowLeft, ArrowRight, ArrowUpRight, BookOpen, Books,
   Check, Code, Copy, FileText, GithubLogo, List, MagnifyingGlass,
@@ -73,12 +74,13 @@ function Sidebar({ current, lastRead, onNavigate }) {
   return <>
     <div className="sidebar-heading"><span>全书目录</span><span className="quiet-count">{chapters.length} 篇</span></div>
     <nav className="chapter-navigation" aria-label="章节目录" ref={navigation}>
-      {data.phases.map((phase) => <section className="nav-phase" key={phase.title}>
+      {data.phases.map((phase, index) => <section className="nav-phase" key={phase.title}>
+        {(index === 0 || phase.kind !== data.phases[index - 1].kind) && <p className="nav-part">{phase.kind === 'topic' ? '专题篇 · 按系统深入' : '基础篇 · 循序渐进'}</p>}
         <h2>{phase.title.replace(/^理解/, '').replace(/^看见/, '')}</h2>
         {phase.chapters.map((chapter) => <a key={chapter.id} href={hrefFor(chapter.id)}
           className={current === chapter.id ? 'chapter-link current' : 'chapter-link'}
           aria-current={current === chapter.id ? 'page' : undefined} onClick={onNavigate}>
-          <span className="chapter-number">{String(chapter.number).padStart(2, '0')}</span>
+          <span className="chapter-number" aria-hidden={phase.kind === 'topic' ? true : undefined}>{phase.kind === 'topic' ? '·' : String(chapter.number).padStart(2, '0')}</span>
           <span>{chapter.title.replace(/：.+$/, '')}</span>
         </a>)}
       </section>)}
@@ -121,11 +123,11 @@ function Home({ lastRead }) {
     </section>
 
     <section className="routes-section">
-      <div className="section-heading"><h2>顺着问题，读下去</h2><p>先建立直觉，再进入设计的边界与取舍。</p></div>
+      <div className="section-heading"><h2>顺着问题，读下去</h2><p>基础篇建立共同语言，专题篇围绕系统能力深入。</p></div>
       <div className="reading-routes">
         {data.phases.map((phase, index) => <a href={`?page=contents#phase-${index}`} className="reading-route" key={phase.title}>
           <span className="route-index">{String(index + 1).padStart(2, '0')}</span>
-          <div><h3>{phase.title}</h3><p>{phase.chapters.length} 篇章节</p></div>
+          <div><h3>{phase.title}</h3><p>{phase.kind === 'topic' ? '系统专题' : '基础阶段'} · {phase.chapters.length} 篇</p></div>
           <Icon icon={ArrowUpRight} size={19} />
         </a>)}
       </div>
@@ -148,17 +150,21 @@ function Footer() {
 
 function Contents({ visited }) {
   return <main className="contents-page page-content" id="main-content" tabIndex={-1}>
-    <header className="page-heading"><p className="eyebrow">全书目录</p><h1>从零，到设计深处。</h1><p>一条循序渐进的阅读路线，也是一组可以反复追问的问题。</p></header>
-    {data.phases.map((phase, index) => <section className="contents-phase" id={`phase-${index}`} key={phase.title}>
-      <div className="contents-phase-heading"><span>{String(index + 1).padStart(2, '0')}</span><h2>{phase.title}</h2></div>
+    <header className="page-heading"><p className="eyebrow">全书目录</p><h1>从零，到设计深处。</h1><p>先循序渐进地建立概念，再按记忆、上下文、工具、协作与可靠执行深入。</p></header>
+    {data.phases.map((phase, index) => <React.Fragment key={phase.title}>
+      {(index === 0 || phase.kind !== data.phases[index - 1].kind) && <div className="contents-part"><span className="small-label">{phase.kind === 'topic' ? 'PART II' : 'PART I'}</span><h2>{phase.kind === 'topic' ? '专题篇 · 比较实现，理解系统设计' : '基础篇 · 从零建立共同语言'}</h2><p>{phase.kind === 'topic' ? '从同一组问题出发，比较不同项目的选择，再沿机制、取舍与失败方式深入。' : '沿一个逐渐复杂的任务，理解 Agent 的参与者、执行过程与基本能力。'}</p></div>}
+      <section className="contents-phase" id={`phase-${index}`}>
+
+      <div className="contents-phase-heading"><span>{phase.kind === 'topic' ? '专题' : String(index + 1).padStart(2, '0')}</span><h2>{phase.title}</h2></div>
+      {phase.description && <p className="contents-phase-description">{phase.description}</p>}
       <div className="contents-chapters">
         {phase.chapters.map((chapter) => <a className="contents-chapter" href={hrefFor(chapter.id)} key={chapter.id}>
-          <span className="chapter-number">{String(chapter.number).padStart(2, '0')}</span>
+          <span className="chapter-number" aria-hidden={phase.kind === 'topic' ? true : undefined}>{phase.kind === 'topic' ? '·' : String(chapter.number).padStart(2, '0')}</span>
           <div><h3>{chapter.title}</h3><p>{chapter.description}</p></div>
           <span className="chapter-duration">{visited.includes(chapter.id) ? '已浏览' : `约 ${documents.get(chapter.id).minutes} 分钟`}</span><Icon icon={ArrowUpRight} size={19} />
         </a>)}
       </div>
-    </section>)}
+    </section></React.Fragment>)}
     <div className="appendix-links"><h2>源码与实验</h2><div><a href={hrefFor('references/glossary')}>术语表<Icon icon={ArrowUpRight} size={17} /></a><a href={hrefFor('references/studies/README')}>源码研究<Icon icon={ArrowUpRight} size={17} /></a><a href={hrefFor('experiments/README')}>机制实验<Icon icon={ArrowUpRight} size={17} /></a></div></div>
     <Footer />
   </main>;
@@ -190,6 +196,7 @@ function Projects({ initialQuery }) {
 function MermaidDiagram({ code, theme }) {
   const id = useId().replace(/[^a-z0-9]/gi, '');
   const [result, setResult] = useState({ code: '', svg: '', error: false });
+  const [expanded, setExpanded] = useState(false);
   useEffect(() => {
     let cancelled = false;
     import('mermaid').then(async ({ default: mermaid }) => {
@@ -199,11 +206,14 @@ function MermaidDiagram({ code, theme }) {
     }).catch(() => { if (!cancelled) setResult({ code, svg: '', error: true }); });
     return () => { cancelled = true; };
   }, [code, theme, id]);
-  return <div className="diagram">
-    {result.code === code && result.svg ? <div className="diagram-image" role="img" aria-label="本节执行过程示意图" dangerouslySetInnerHTML={{ __html: result.svg }} />
+  const title = code.match(/^%%\s+(.+)/)?.[1] || '执行过程与责任流转';
+  return <figure className={expanded ? 'diagram diagram-expanded' : 'diagram'}>
+    <figcaption><span>图解</span>{title}</figcaption>
+    <div className="diagram-controls"><span>{expanded ? '可左右滚动查看细节' : '可放大查看细节'}</span><button type="button" aria-pressed={expanded} onClick={() => setExpanded(!expanded)}>{expanded ? '适应宽度' : '放大图表'}</button></div>
+    {result.code === code && result.svg ? <div className="diagram-image" tabIndex={0} role="img" aria-label={title} dangerouslySetInnerHTML={{ __html: result.svg }} />
       : <p className="diagram-status" role="status">{result.error ? '流程图暂未显示，可以展开文字源码。' : '正在绘制流程图…'}</p>}
-    <details><summary>查看图表源码</summary><pre><code>{code}</code></pre></details>
-  </div>;
+    <details><summary>查看图表源码</summary><pre tabIndex={0} aria-label="图表源码"><code>{code}</code></pre></details>
+  </figure>;
 }
 
 function CodeBlock({ children }) {
@@ -218,7 +228,7 @@ function CodeBlock({ children }) {
       clearTimeout(timer.current); timer.current = setTimeout(() => setCopied(false), 2000);
     } catch { setFailed(true); }
   }
-  return <div className="code-block"><button className="code-copy" onClick={copy} aria-label={copied ? '已复制代码' : '复制代码'}><Icon icon={copied ? Check : Copy} size={16} />{copied ? '已复制' : '复制'}</button><pre>{children}</pre>{failed && <span className="copy-error" role="status">复制失败，请选择文本后复制。</span>}</div>;
+  return <div className="code-block"><button className="code-copy" onClick={copy} aria-label={copied ? '已复制代码' : '复制代码'}><Icon icon={copied ? Check : Copy} size={16} />{copied ? '已复制' : '复制'}</button><pre tabIndex={0} aria-label="代码示例">{children}</pre>{failed && <span className="copy-error" role="status">复制失败，请选择文本后复制。</span>}</div>;
 }
 
 function Reader({ doc, theme, fontSize, setFontSize }) {
@@ -267,7 +277,7 @@ function Reader({ doc, theme, fontSize, setFontSize }) {
     },
   }), [doc, theme]);
   const markdown = useMemo(() => body.text !== undefined
-    ? <Markdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeSlug]} components={components}>{body.text}</Markdown>
+    ? <Markdown remarkPlugins={[remarkGfm, readingBlocks]} rehypePlugins={[rehypeSlug]} components={components}>{body.text}</Markdown>
     : null, [body.text, components]);
   return <main className="reader-page" id="main-content" tabIndex={-1} style={{ '--reading-size': `${fontSize}px` }}>
     <div className="reading-progress" aria-hidden="true" />
@@ -275,7 +285,7 @@ function Reader({ doc, theme, fontSize, setFontSize }) {
       <article className="reader-article" ref={article}>
         <header className="article-heading">
           <div className="breadcrumbs"><a href="?page=contents">全书目录</a><span>/</span><span>{phase?.title || doc.kind}</span></div>
-          <div className="article-meta"><span>{doc.number === null ? doc.kind : doc.number === 0 ? '开篇' : `第 ${doc.number} 章`}</span><span>约 {doc.minutes} 分钟</span></div>
+          <div className="article-meta"><span>{phase?.kind === 'topic' ? '系统专题' : doc.number === null ? doc.kind : doc.number === 0 ? '开篇' : `第 ${doc.number} 章`}</span><span>约 {doc.minutes} 分钟</span></div>
           <h1>{doc.displayTitle}</h1>
           <div className="article-tools"><span>对照源码，理解设计取舍。</span><div className="font-controls" role="group" aria-label="正文字号"><Icon icon={TextAa} size={18} /><button disabled={fontSize <= 16} onClick={() => setFontSize(fontSize - 1)} aria-label="减小字号">小</button><button disabled={fontSize >= 23} onClick={() => setFontSize(fontSize + 1)} aria-label="增大字号">大</button></div></div>
         </header>

@@ -1,4 +1,4 @@
-# 第二十一章：明明限制了步数，为什么还能花掉更多资源？
+# 明明限制了步数，为什么还能花掉更多资源？
 
 本章对照两个范围：SDK 的三个应用运行入口，以及实验实际使用的一个已编译图调用入口。运行入口不与子 Agent 包装器、重试配置或输入对象重复计数。实际运行只覆盖 SDK 的异步入口和图的同步入口，其余边界依据固定源码讨论。
 
@@ -98,4 +98,4 @@ SDK 使用已保存运行状态恢复时，可以取回原有轮数与上限；�
 [^concurrency]: [本地同步与异步工具批次](../langgraph/libs/prebuilt/langgraph/prebuilt/tool_node.py#L827-L868) · [固定源码](https://github.com/langchain-ai/langgraph/blob/41c9c22fdc83d68a2859d0c9a2b627c8615a792f/libs/prebuilt/langgraph/prebuilt/tool_node.py#L827-L868)；[同步执行器配置](https://github.com/langchain-ai/langchain/blob/bd5b134d876ef47858beef27bd29c81eeda03293/libs/core/langchain_core/runnables/config.py#L660-L675)。
 [^resume]: [本地 SDK 恢复的上限](../openai-agents-python/src/agents/run.py#L678-L697) · [固定源码](https://github.com/openai/openai-agents-python/blob/9abc9182d06dbd28330af888306031269d57a175/src/agents/run.py#L678-L697)；[恢复的当前轮数](https://github.com/openai/openai-agents-python/blob/9abc9182d06dbd28330af888306031269d57a175/src/agents/run.py#L813-L833)；[图停止位置的计算](https://github.com/langchain-ai/langgraph/blob/41c9c22fdc83d68a2859d0c9a2b627c8615a792f/libs/langgraph/langgraph/pregel/_loop.py#L1879-L1881)。更完整条件见 [预算研究](../references/studies/execution-budgets.md)。
 
-[上一章：信任边界](20-trust-boundaries.md) · [下一章：结果验收与评测](22-evaluation-and-completion.md)
+[上一章：文档里的一句话，为什么变成了行动指令？](20-trust-boundaries.md) · [下一章：谁来证明 Agent 真的完成了？](22-evaluation-and-completion.md)

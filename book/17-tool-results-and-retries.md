@@ -1,4 +1,4 @@
-# 第十七章：工具返回了，任务为什么还没有完成？
+# 工具返回了，任务为什么还没有完成？
 
 本章观察一种工具节点的两个执行入口：同步提交和异步提交。统计对象是 LangGraph 的 `ToolNode`，参数消息、业务函数和返回消息都不另算入口。实际实验经由编译图的同步入口驱动节点，没有运行异步或模型调用。
 
@@ -92,6 +92,6 @@ flowchart LR
 [^errors]: [本地默认处理器](../langgraph/libs/prebuilt/langgraph/prebuilt/tool_node.py#L391-L399) · [固定源码](https://github.com/langchain-ai/langgraph/blob/41c9c22fdc83d68a2859d0c9a2b627c8615a792f/libs/prebuilt/langgraph/prebuilt/tool_node.py#L391-L399)；[特殊错误与转换](https://github.com/langchain-ai/langgraph/blob/41c9c22fdc83d68a2859d0c9a2b627c8615a792f/libs/prebuilt/langgraph/prebuilt/tool_node.py#L949-L1029)；[未知工具名](https://github.com/langchain-ai/langgraph/blob/41c9c22fdc83d68a2859d0c9a2b627c8615a792f/libs/prebuilt/langgraph/prebuilt/tool_node.py#L1302-L1313)。
 [^batch]: [本地批次执行与合并](../langgraph/libs/prebuilt/langgraph/prebuilt/tool_node.py#L827-L895) · [固定源码](https://github.com/langchain-ai/langgraph/blob/41c9c22fdc83d68a2859d0c9a2b627c8615a792f/libs/prebuilt/langgraph/prebuilt/tool_node.py#L827-L895)。
 [^retry]: [本地重试策略](../langgraph/libs/langgraph/langgraph/_internal/_retry.py) · [固定源码](https://github.com/langchain-ai/langgraph/blob/41c9c22fdc83d68a2859d0c9a2b627c8615a792f/libs/langgraph/langgraph/_internal/_retry.py#L1-L28)；节点重入与待交付状态清理见 [重试研究](../references/studies/tool-results-and-retries.md)。
-[^identity]: [本地工具消息定义](../langchain/libs/core/langchain_core/messages/tool.py#L26-L82) · [固定源码](https://github.com/langchain-ai/langchain/blob/bd5b134d876ef47858beef27bd29c81eeda03293/libs/core/langchain_core/messages/tool.py#L26-L82)；业务动作标识与恢复见 [第十四章](14-resume-and-side-effects.md)。
+[^identity]: [本地工具消息定义](../langchain/libs/core/langchain_core/messages/tool.py#L26-L82) · [固定源码](https://github.com/langchain-ai/langchain/blob/bd5b134d876ef47858beef27bd29c81eeda03293/libs/core/langchain_core/messages/tool.py#L26-L82)；业务动作标识与恢复见 [执行恢复专题](14-resume-and-side-effects.md)。
 
-[上一章：MCP 宿主差异](16-mcp-host-differences.md) · [下一章：上下文压缩](18-context-compaction.md)
+[上一章：同一个 MCP 服务，为什么进入两个 Agent 后表现不同？](16-mcp-host-differences.md) · [下一章：叫来更多 Agent，为什么还要有人收尾？](19-delegation-and-handoffs.md)

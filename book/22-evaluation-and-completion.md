@@ -1,4 +1,4 @@
-# 第二十二章：谁来证明 Agent 真的完成了？
+# 谁来证明 Agent 真的完成了？
 
 周一，报表平台显示成功，产物却少了一天。周二，日期齐全，合计数字错了。周三，数字终于正确，助手却为此修改了用户没有授权修改的配置。
 
@@ -98,4 +98,4 @@
 [^bench]: [SWE-bench 原始论文 v1](https://arxiv.org/abs/2310.06770v1) · [固定历史判定代码](https://github.com/SWE-bench/SWE-bench/blob/b8299951846f4b6ef23176f8c137cffda79bc747/metrics/metrics.py#L78-L95)；[τ-bench 原始论文 v1](https://arxiv.org/abs/2406.12045v1) · [固定历史状态与回复检查](https://github.com/sierra-research/tau-bench/blob/6f4b718037db619539b8b692060e6686f3f0dcc9/tau_bench/envs/base.py#L107-L149)。
 [^repeat]: [τ-bench 原始论文 v1](https://arxiv.org/pdf/2406.12045v1#page=4)；定义与适用条件详见 [评测研究](../references/studies/evaluation-and-evidence.md)。
 
-[上一章：执行预算](21-execution-budgets.md) · [返回全书目录](README.md)
+[上一章：明明限制了步数，为什么还能花掉更多资源？](21-execution-budgets.md) · [返回全书目录](README.md)

@@ -1,4 +1,4 @@
-# 第二十章：文档里的一句话，为什么变成了行动指令？
+# 文档里的一句话，为什么变成了行动指令？
 
 本章追踪两条有限路径：一个已注册 MCP 工具从准备到执行，以及一次已保存结果的读取。前一条按模型可调用的具体工具计数，入口数量随目录变化；后一条只研究一个读取入口。工具注解、调用数据与缓存对象不另算执行入口。
 
@@ -84,4 +84,4 @@ MCP 的指定版本分别描述结构化结果与工具行为注解，并要求�
 [^cache-read]: [本地文本副本表示](../cline/sdk/packages/core/src/session/services/tool-result-cache.ts#L100-L164) · [固定源码](https://github.com/cline/cline/blob/b549ceb4bb4247284c975f6d6ca0979decec097c/sdk/packages/core/src/session/services/tool-result-cache.ts#L100-L164)；[按会话读取](https://github.com/cline/cline/blob/b549ceb4bb4247284c975f6d6ca0979decec097c/sdk/packages/core/src/session/services/tool-result-cache.ts#L59-L72)。
 [^cache-miss]: [本地缓存实现](../cline/sdk/packages/core/src/session/services/tool-result-cache.ts) · [容量、过期与缺失提示的源码研究](../references/studies/trust-and-tool-content.md)。
 
-[上一章：委派与交接](19-delegation-and-handoffs.md) · [下一章：执行预算](21-execution-budgets.md)
+[上一章：从断点继续，为什么会再做一遍？](14-resume-and-side-effects.md) · [下一章：明明限制了步数，为什么还能花掉更多资源？](21-execution-budgets.md)
