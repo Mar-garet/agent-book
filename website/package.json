@@ -9,7 +9,8 @@
     "check:markdown": "node scripts/check-markdown.mjs",
     "preview": "vite preview --host 127.0.0.1 --port 4173 --strictPort",
     "test": "playwright test",
-    "previews": "node scripts/export-previews.mjs"
+    "previews": "node scripts/export-previews.mjs",
+    "export:pdf": "node scripts/export-pdf.mjs"
   },
   "engines": {
     "node": ">=22.12.0"

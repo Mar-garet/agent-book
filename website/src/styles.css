@@ -573,3 +573,91 @@ dialog::backdrop { background: rgb(28 30 24 / .34); backdrop-filter: blur(3px); 
   .home-page .deep-stories h3 { font-size: 25px; }
   .home-page .deep-stories h3 br { display: none; }
 }
+
+/* Code is an explanation of one mechanism; the print view keeps both languages. */
+.code-toolbar { display: flex; align-items: center; justify-content: space-between; padding: 7px 12px 7px 20px; border-bottom: 1px solid var(--line); color: var(--secondary); font: 12px/1.5 ui-monospace, monospace; }
+.code-toolbar .code-copy { position: static; min-height: 32px; }
+.prose .code-block pre { padding: 18px 22px; }
+.code-language-tabs { display: flex; gap: 5px; padding: 0; border-bottom: 1px solid var(--line); }
+.code-language-tabs button { min-height: 44px; padding: 10px 18px; border: 0; border-bottom: 2px solid transparent; background: none; color: var(--secondary); font-size: 13px; border-radius: 0; }
+.code-language-tabs button[aria-selected='true'] { border-bottom-color: var(--accent); color: var(--accent); }
+.prose .code-comparison { margin: 1.6em 0; }
+.code-comparison .code-block { margin-top: 0; border-top: 0; border-radius: 0 0 6px 6px; }
+.diagram { position: relative; padding: 24px; background: var(--surface); border-radius: 5px; border: 1px solid var(--line); }
+.diagram figcaption { font-size: 14px; font-weight: 500; margin: 0 0 25px; padding-right: 110px; }
+.diagram-controls { position: absolute; right: 14px; top: 12px; margin: 0; }
+.diagram-controls button { display: inline-flex; gap: 7px; align-items: center; font-size: 12px; background: none; border: 0; }
+.diagram-image { padding: 8px 0; }
+.diagram-source { border-top: 1px solid var(--line); padding-top: 6px; }
+.reading-references { margin-top: 2.5em; border-top: 1px solid var(--line); font-size: .78em; color: var(--secondary); padding-top: 14px; }
+.reading-references > summary { cursor: pointer; min-height: 44px; align-content: center; }
+.print-layout .sidebar { display: none; }
+.print-layout .main-shell { margin-left: 0; }
+.print-book-page { padding: 28px 24px 60px; background: var(--sidebar); min-height: 100dvh; }
+.print-toolbar { max-width: 1100px; margin: 0 auto 30px; display: flex; gap: 28px; align-items: center; justify-content: space-between; }
+.print-toolbar > a { display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; font-size: 13px; }
+.print-toolbar h1 { margin: 0 0 7px; font-size: 20px; }
+.print-toolbar p { margin: 0; color: var(--secondary); font-size: 13px; line-height: 1.8; }
+.print-book { --paper: #fff; --surface: #fff; --ink: #252922; --secondary: #54594f; --muted: #62685b; --line: #d8dbd2; --feature: #f3f4ef; --code: #f5f6f2; --accent: #a3412d; --accent-soft: #f4e8e2; color: var(--ink); background: var(--paper); width: min(100%, 900px); margin: 0 auto; padding: 65px 70px; }
+.print-cover { text-align: center; padding: 50px 0 80px; }
+.print-book-name { font: 48px/1.2 'Newsreader Variable', Georgia, serif; margin: 0 0 32px; }
+.print-cover h2 { font: 36px/1.5 'Songti SC', 'STSong', serif; margin: 0 0 20px; }
+.print-cover > p { color: var(--secondary); }
+.print-cover img { width: min(100%, 480px); height: auto; margin: 25px auto; display: block; }
+.print-cover-note { font-size: 14px; }
+.print-contents { padding: 35px 0 50px; }
+.print-contents h2 { font: 28px/1.5 'Songti SC', 'STSong', serif; margin: 0 0 20px; }
+.print-contents ol { padding-left: 24px; line-height: 2; font-size: 15px; }
+.print-contents li { padding-left: 8px; margin-bottom: 7px; }
+.print-chapter { padding-top: 48px; }
+.print-chapter > header { border-bottom: 1px solid var(--line); padding-bottom: 25px; margin-bottom: 28px; }
+.print-chapter-number { color: var(--accent); font-size: 13px; margin: 0 0 14px; }
+.print-chapter > header h2 { font: 30px/1.6 'Songti SC', 'STSong', serif; margin: 0; }
+.print-book .prose { font-size: 17px; line-height: 1.9; }
+.print-book .prose .reading-references, .print-book .prose .footnotes { display: none; }
+@media (max-width: 767px) {
+  .diagram { padding: 18px 14px; }
+  .diagram figcaption { padding-right: 75px; font-size: 12px; }
+  .diagram-controls { right: 5px; top: 6px; }
+  .diagram-controls button { padding-inline: 5px; font-size: 11px; }
+  .print-book-page { padding: 20px 10px; }
+  .print-toolbar { flex-wrap: wrap; gap: 15px; padding-inline: 12px; }
+  .print-toolbar > div { order: 3; width: 100%; }
+  .print-book { padding: 28px 24px; }
+  .print-cover { padding-top: 25px; }
+}
+@page { size: A4; margin: 19mm 17mm 20mm; }
+@media print {
+  :root { --paper: #fff; --surface: #fff; --ink: #252922; --secondary: #54594f; --muted: #62685b; --line: #d8dbd2; --feature: #f3f4ef; --code: #f5f6f2; --accent: #a3412d; }
+  html, body, .print-book-page, .print-book { background: #fff !important; color: #252922; }
+  body { min-width: 0; }
+  .skip-link, .print-toolbar, .code-copy, .code-language-tabs, .diagram-controls, .diagram-source, .reading-references, .topic-reading-list, .breadcrumbs, .article-meta, .article-source { display: none !important; }
+  .print-book-page, .print-book { width: auto; max-width: none; margin: 0; padding: 0; }
+  .print-cover { break-after: page; padding: 30mm 0 0; }
+  .print-cover img { width: 120mm; }
+  .print-contents { break-after: page; padding: 0; }
+  .print-chapter { break-before: page; padding: 0; }
+  .print-book .prose, .prose { font-size: 10.5pt; line-height: 1.85; }
+  .print-chapter > header { margin-bottom: 7mm; padding-bottom: 5mm; }
+  .print-chapter > header h2 { font-size: 21pt; line-height: 1.5; }
+  .prose h2 { font-size: 15pt; break-after: avoid; }
+  .prose h3 { font-size: 12pt; break-after: avoid; }
+  .prose p { orphans: 3; widows: 3; }
+  .code-comparison [role='tabpanel'][hidden] { display: block !important; }
+  .prose .code-block { break-inside: avoid; margin: 4mm 0; border: 1px solid #d8dbd2; border-radius: 0; }
+  .code-toolbar { font-size: 9pt; padding: 2mm 3mm; background: #f3f4ef; }
+  .prose .code-block pre { white-space: pre-wrap; overflow: visible; overflow-wrap: anywhere; font-size: 8pt; line-height: 1.65; padding: 3mm; }
+  .prose .code-block pre code { white-space: pre-wrap; overflow-wrap: anywhere; }
+  .table-scroll { overflow: visible; break-inside: auto; border-radius: 0; }
+  .prose table { font-size: 8.5pt; width: 100%; min-width: 0; table-layout: fixed; }
+  .prose td, .prose th { min-width: 0; padding: 2mm 2.5mm; overflow-wrap: anywhere; }
+  .prose thead { display: table-header-group; }
+  .prose tr { break-inside: avoid; }
+  .diagram { break-inside: avoid; border-radius: 0; margin: 6mm 0; padding: 4mm; }
+  .diagram figcaption { padding-right: 0; margin-bottom: 4mm; font-size: 10pt; }
+  .diagram-image { overflow: visible; padding: 0; }
+  .diagram-image svg, .diagram-expanded .diagram-image svg { min-width: 0; max-width: 100%; width: 100%; max-height: 175mm; height: auto; }
+  .prose .reading-callout { break-inside: avoid; padding: 4mm; border-radius: 0; }
+  .reader-grid, .reader-article { display: block; width: auto; max-width: none; padding: 0; }
+  a { color: inherit !important; text-decoration: none !important; }
+}

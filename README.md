@@ -9,7 +9,7 @@
 <p align="center">An open book in Chinese · 23 chapters · 5 system topics · Principles, mechanisms, and trade-offs</p>
 
 <p align="center">
-  <a href="https://mar-garet.github.io/agent_book/">Read the book →</a>
+  <a href="https://mar-garet.github.io/agent-book/">Read the book →</a>
 </p>
 
 ---
@@ -18,15 +18,15 @@ How do agents use tools, remember information, plan tasks, and work together? Wh
 
 **Agent Book puts design thinking first.** It starts with how agents work, then examines why they are built that way, what alternatives exist, and when each choice makes sense.
 
-Open-source projects—including Pi, Codex, LangGraph, Deep Agents, Hermes, and OpenClaw—provide concrete cases. Source code and experiments ground the discussion, helping you apply the underlying ideas to your own systems.
+Comparisons draw on 32 open-source projects across coding assistants, agent runtimes, and frameworks. Their different approaches make the design choices concrete, helping you reason about your own system.
 
 ## The approach
 
-**Start with a problem.** Take memory: what deserves to be remembered? How should outdated facts expire? Which version of a rule applies to a historical task? Compare how Hermes, OpenClaw, and LangGraph handle these questions, then reason about your own storage, retrieval, and update policies.
+**Start with a problem.** Take memory: what deserves to be remembered? How should outdated facts expire? Which version of a rule applies to a historical task? Compare file-based rules, background extraction, shared stores, and retrieval-driven memory, then reason about your own update and consistency policies.
 
 **Explain the choices and their costs.** When should a model choose the next step, and when should the application fix the workflow? When is another agent worth the coordination cost? Each discussion connects goals and constraints to alternatives, trade-offs, and failure modes.
 
-**Use implementation as evidence.** Code clarifies key mechanisms. Experiments reveal boundaries that intuition can miss. The prose explains the design; linked sources let you investigate further.
+**Use implementation as evidence.** Code clarifies key mechanisms. Experiments reveal boundaries that intuition can miss. The prose explains the design in place. Optional research notes let you investigate further; paired TypeScript and Python examples illustrate the mechanisms.
 
 ## Inside the book
 
@@ -50,9 +50,9 @@ The foundations introduce models, tools, and the agent loop, then build toward M
 
 You can read the book without installing a framework or obtaining a model API key. Source studies and experiment instructions provide a separate path for deeper investigation. **The book itself is currently written in Chinese.**
 
-## Sources and experiments
+## Research behind the book
 
-Claims about project behavior link to local source material and pinned commits. Companion studies trace the relevant execution paths. **Five experiment groups, with 31 deterministic scenarios**, examine recovery, tool retries, delegation budgets, summary inputs, and acceptance rules using scripted inputs or simulated services.
+Companion studies trace nine design dimensions across all 32 projects, with implementation details and version boundaries kept outside the main narrative. The reader also includes a whole-book print view for saving a PDF. **Five experiment groups, with 31 deterministic scenarios**, examine recovery, tool retries, delegation budgets, summary inputs, and acceptance rules using scripted inputs or simulated services.
 
 Teaching scenarios, design inferences, and observed results are identified separately. The running case connects the design discussions; it has not been evaluated as an end-to-end task with a real model.
 

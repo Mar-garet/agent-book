@@ -5,7 +5,6 @@ import AxeBuilder from '@axe-core/playwright';
 test('Chinese emphasis renders without leaking Markdown punctuation into prose', async ({ page }) => {
   for (const [id, label] of [
     ['book/06-memory', '跨任务的持久信息'],
-    ['book/18-context-compaction', '只有前 2,000 个字符串单位'],
     ['references/studies/tool-results-and-retries', '默认策略不是捕获所有工具执行异常'],
     ['references/studies/trust-and-tool-content', '来源提示与技术强制的边界'],
   ]) {
@@ -26,15 +25,16 @@ test('search opens a chapter, follows its sources and preserves browser navigati
   await dialog.locator('.search-result').filter({ hasText: '为什么会再做一遍' }).first().click();
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('从断点继续，为什么会再做一遍？');
   await expect(page.locator('.sidebar [aria-current="page"]')).toBeInViewport();
-  await expect(page.locator('.prose')).toContainText('两张审查单');
-  await page.locator('.prose a').filter({ hasText: '源码研究记录' }).click();
-  await expect(page.getByRole('heading', { level: 1 })).toContainText('LangGraph');
+  await expect(page.locator('.prose')).toContainText('审查单');
+  await page.locator('.reading-references summary').click();
+  await page.locator('.reading-references a').first().click();
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('章节参考资料');
   await expect(page.locator('.prose a[href*="github.com/langchain-ai/langgraph/blob/41c9c22"]')).not.toHaveCount(0);
   await page.goBack();
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('从断点继续，为什么会再做一遍？');
-  await page.locator('.on-this-page a').filter({ hasText: '拆开节点' }).click();
+  await page.locator('.on-this-page a').filter({ hasText: '第二种安排' }).click();
   await expect(page).toHaveURL(/#/);
-  await expect(page.locator('.prose h2').filter({ hasText: '拆开节点' })).toBeInViewport();
+  await expect(page.locator('.prose h2').filter({ hasText: '第二种安排' })).toBeInViewport();
   expect(errors).toEqual([]);
 });
 
@@ -61,7 +61,6 @@ test('the public reader serves manuscripts and experiment records without GitHub
   const raw = await page.request.get('/manuscript/book/14-resume-and-side-effects.md');
   expect(raw.ok()).toBe(true);
   expect(await raw.text()).toContain('# 从断点继续，为什么会再做一遍？');
-  await expect(page.locator('.prose a').filter({ hasText: '原始结果' })).toHaveAttribute('href', './downloads/experiments/results/langgraph-interrupt-replay.json');
   const results = await page.request.get('/downloads/experiments/results/langgraph-interrupt-replay.json');
   expect(results.ok()).toBe(true);
   expect((await results.json()).cases).toHaveLength(4);
@@ -81,7 +80,7 @@ test('later chapters remain connected and all experiment attachments are public'
   }
   await page.goto('/?read=book%2F22-evaluation-and-completion');
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('评测系统：让任务完成成为可复核的结论');
-  await expect(page.locator('.prose a').filter({ hasText: '离线验收记录' })).toHaveAttribute('href', './downloads/experiments/results/task-acceptance.json');
+  await expect(page.locator('.prose')).toContainText('job-43');
   const manifestResponse = await page.request.get('/downloads/experiments/manifest.json');
   expect(manifestResponse.ok()).toBe(true);
   const manifest = await manifestResponse.json();
@@ -189,13 +188,13 @@ for (const width of [375, 1440]) {
       await page.goto('/');
       await page.evaluate((value) => localStorage.setItem('agent-book-theme', JSON.stringify(value)), theme);
       await page.goto('/?read=book%2F15-memory-update-boundaries');
-      await expect(page.locator('.diagram-image svg')).toHaveCount(2);
-      await expect(page.locator('.reading-callout')).toHaveCount(2);
-      await expect(page.locator('.reading-callout').first()).toContainText('阅读提示');
+      await expect(page.locator('.diagram-image svg')).toHaveCount(1);
+      await expect(page.locator('.reading-callout').first()).toBeVisible();
+      await expect(page.locator('.reading-callout').first()).toContainText('保存成功');
       await expect(page.locator('.prose')).not.toContainText('[!NOTE]');
       await expect(page.locator('.prose')).not.toContainText('**');
       const comparison = page.locator('.table-scroll').first();
-      await expect(comparison.locator('th')).toHaveText(['比较维度', 'Hermes', 'OpenClaw', 'LangGraph']);
+      await expect(comparison.locator('th')).toHaveText(['观察对象', '内容', '对任务的含义']);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       const findings = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze();
       expect(findings.violations.map(({ id }) => id)).toEqual([]);
@@ -205,8 +204,8 @@ for (const width of [375, 1440]) {
       await page.screenshot({ path: `test-results/memory-comparison-${width}-${theme}.png` });
       const diagram = page.locator('.diagram').first();
       await diagram.getByRole('button', { name: '放大图表' }).click();
-      await expect(diagram.getByRole('button', { name: '适应宽度' })).toHaveAttribute('aria-pressed', 'true');
-      expect(await diagram.locator('svg').evaluate((svg) => svg.getBoundingClientRect().width >= Math.min(680, svg.viewBox.baseVal.width))).toBe(true);
+      await expect(diagram.getByRole('button', { name: '适应图表宽度' })).toHaveAttribute('aria-pressed', 'true');
+      expect(await diagram.locator('.diagram-image svg').evaluate((svg) => svg.getBoundingClientRect().width >= Math.min(680, svg.viewBox.baseVal.width))).toBe(true);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     });
   }
@@ -261,3 +260,34 @@ for (const [width, theme] of [[375, 'dark'], [1440, 'light']]) {
     }
   });
 }
+
+
+test('whole-book print includes every chapter, complete diagrams and both languages', async ({ page }) => {
+  test.setTimeout(120000);
+  const errors = [];
+  page.on('pageerror', error => errors.push(error.message));
+  await page.goto('/?page=print');
+  await expect(page.locator('[data-print-ready="true"]')).toBeVisible({ timeout: 90000 });
+  await expect(page.locator('.print-chapter')).toHaveCount(23);
+  const diagrams = await page.locator('.diagram-image svg').count();
+  expect(diagrams).toBeGreaterThan(10);
+  await expect(page.locator('.diagram-status')).toHaveCount(0);
+  const pairs = page.locator('.code-comparison');
+  expect(await pairs.count()).toBeGreaterThanOrEqual(8);
+  const first = pairs.first();
+  await first.getByRole('tab', { name: 'Python', exact: true }).click();
+  await expect(first.getByRole('tabpanel')).toContainText('def ');
+  await page.keyboard.press('Home');
+  await expect(first.getByRole('tab', { name: 'TypeScript', exact: true })).toBeFocused();
+  await expect(first.getByRole('tabpanel')).toContainText('function ');
+  await page.emulateMedia({ media: 'print' });
+  await page.setViewportSize({ width: 660, height: 950 });
+  expect(await pairs.locator('[role=tabpanel]').evaluateAll(panels => panels.every(panel => getComputedStyle(panel).display !== 'none'))).toBe(true);
+  expect(await page.locator('.print-book .code-block pre').evaluateAll(blocks => blocks.every(block => block.scrollWidth <= block.clientWidth + 1))).toBe(true);
+  const anchors = await page.locator('.print-contents a').evaluateAll(links => links.map(link => document.querySelector(link.getAttribute('href')) !== null));
+  expect(anchors.every(Boolean)).toBe(true);
+  const ids = await page.locator('[id]').evaluateAll(nodes => nodes.map(node => node.id));
+  expect(new Set(ids).size).toBe(ids.length);
+  await expect(page.locator('.print-book')).not.toContainText('**');
+  expect(errors).toEqual([]);
+});

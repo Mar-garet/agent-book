@@ -61,7 +61,7 @@ for (const file of paths.sort()) {
   for (const line of body.split('\n')) {
     if (line.startsWith('```')) fenced = !fenced;
     const match = !fenced && line.match(/^(#{2,3}) (.+)$/);
-    if (match) {
+    if (match && match[2] !== '延伸阅读') {
       const text = match[2].replace(/[`*]/g, '');
       headings.push({ text, id: slugger.slug(text), level: match[1].length });
     }

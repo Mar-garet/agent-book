@@ -55,14 +55,109 @@ flowchart TD
 
 Agent 的决策可以嵌入工作流，工作流也可以成为 Agent 可选择的一个动作。两者的组合方式，决定哪些地方允许探索、哪些地方必须遵守顺序。
 
-LangGraph 的材料将长期、有状态的执行、人工介入和持久化作为重要能力，适合帮助我们研究循环之外的执行结构。[参考 L01](../references/evidence.md#l01-langgraph-的执行状态)
+LangGraph 的材料将长期、有状态的执行、人工介入和持久化作为重要能力，适合帮助我们研究循环之外的执行结构。
+
+## 把循环写成一个可观察的程序
+
+先用一个很小的程序把责任放到一起。它演示两个读取以及核对成功的分支：取得 E42，确认映射不匹配，最后报告“具备提交方案的依据”。这里用确定的函数代替模型和服务，R42 的正文进度仍停在待核对线索；`ready` 也不代表报表已经修好。
+
+选择函数只能提出动作。运行程序先检查动作和环境，工具返回观察，程序再更新已确认状态。即使选择函数提出结束，程序也要检查证据是否齐全；轮数耗尽则返回另一种结果。下面两份代码行为相同、无需外部依赖，输出均为 `ready:E42,mapping-mismatch`。
+
+```typescript
+// model 和工具的确定性替身；没有调用真实模型或生产服务。
+type State = { observations: string[]; confirmed: boolean };
+type Action = [string, string];
+
+function choose(state: State): Action {
+  if (state.observations.length === 0) return ["read_log", "production"];
+  if (!state.confirmed) return ["check_mapping", "production"];
+  return ["finish", "production"];
+}
+
+function execute(kind: string): string {
+  if (kind === "read_log") return "E42";
+  if (kind === "check_mapping") return "mapping-mismatch";
+  throw new Error("unknown tool");
+}
+
+function run(maxSteps = 3): string {
+  const state: State = { observations: [], confirmed: false };
+  for (let step = 0; step < maxSteps; step++) {
+    const [kind, environment] = choose(state);
+    if (kind === "finish") {
+      return state.confirmed
+        ? `ready:${state.observations.join(",")}`
+        : "needs-evidence";
+    }
+    // 这个最小调查只准读取生产资料，没有注册任何写操作。
+    if (environment !== "production" ||
+        !["read_log", "check_mapping"].includes(kind)) return "denied";
+    const observation = execute(kind);
+    state.observations.push(observation);
+    if (kind === "check_mapping") state.confirmed = true;
+  }
+  return "budget-exhausted";
+}
+
+console.log(run());
+```
+
+```python
+# model 和工具的确定性替身；没有调用真实模型或生产服务。
+from dataclasses import dataclass, field
+
+@dataclass
+class State:
+    observations: list[str] = field(default_factory=list)
+    confirmed: bool = False
+
+def choose(state: State) -> tuple[str, str]:
+    if not state.observations:
+        return "read_log", "production"
+    if not state.confirmed:
+        return "check_mapping", "production"
+    return "finish", "production"
+
+def execute(kind: str) -> str:
+    if kind == "read_log":
+        return "E42"
+    if kind == "check_mapping":
+        return "mapping-mismatch"
+    raise ValueError("unknown tool")
+
+def run(max_steps: int = 3) -> str:
+    state = State()
+    for _ in range(max_steps):
+        kind, environment = choose(state)
+        if kind == "finish":
+            return ("ready:" + ",".join(state.observations)
+                    if state.confirmed else "needs-evidence")
+        # 这个最小调查只准读取生产资料，没有注册任何写操作。
+        if environment != "production" or kind not in {"read_log", "check_mapping"}:
+            return "denied"
+        observation = execute(kind)
+        state.observations.append(observation)
+        if kind == "check_mapping":
+            state.confirmed = True
+    return "budget-exhausted"
+
+print(run())
+```
+
+换成真实模型时，选择函数要接收当前输入、解析模型返回的请求；换成真实服务时，工具必须返回实际证据。参数解析、异常、取消和持久化还需补齐。这个骨架刻意先展示一件事：提出结束、允许行动、形成事实和返回结果，分别发生在程序的明确位置。
+
+不同系统在这个骨架上选择不同的执行单位。OpenAI Agents SDK 的一次轮数对应一次模型调用；AutoGen 的一次工具迭代可以并行执行多项工具；Aider 的修正循环则由补丁和检查反馈驱动。比较“最多三步”之前，应先确认这三步到底数的是什么。
 
 ## 中断暴露了循环的空隙
 
 这个循环还有一个容易被忽视的空隙。假设后续验证已发起测试重跑 job-42，系统却在收到结果前退出。重启后的助手如果只看见“尚未验证”，就可能再发起一次重跑。
 
-保存了动作请求，才知道自己尝试过什么；保留了外部任务编号，才有机会查询上次结果。上一次运行是否已经成功、重复运行会产生什么影响，都应先核对，再决定恢复动作。可靠执行专题会继续拆开这个空隙。
+保存了动作请求，才知道自己尝试过什么；保留了外部任务编号，才有机会查询上次结果。上一次运行是否已经成功、重复运行会产生什么影响，都应先核对，再决定恢复动作。因此，保存动作身份和查询上次结果，应当成为恢复设计的一部分。
 
 眼下，助手已经找到正确日志，能够依据观察调整行动。下一步要让“读取生产日志”和“重新运行测试报表”的差别进入工具约定，否则循环只会更快地放大含糊的动作。
+
+## 延伸阅读
+
+[相关实现与研究资料](../references/chapter-notes.md#02-the-agent-loop)
 
 [上一章](01-model-agent-and-harness.md) · [下一章：工具调用](03-tool-calling.md)

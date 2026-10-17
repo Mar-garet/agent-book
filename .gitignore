@@ -12,3 +12,4 @@ website/public/manuscript/
 website/public/downloads/
 website/test-results/
 website/playwright-report/
+/output/pdf/

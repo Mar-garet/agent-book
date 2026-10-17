@@ -4,6 +4,16 @@
 
 阅读实现和上游测试，可以确认程序写下的约定；实际运行能观察特定环境中的行为。每份记录分别说明采用了哪种方法，以及仍需验证的范围。
 
+## 全部仓库的横向调查
+
+[系统设计分歧与覆盖索引](../system-design-map.md) 按九个主题归纳 32 个仓库，并链接到 288 项静态研究记录。这里的覆盖指关键调用链和范围被记录，不等于每个项目默认提供同样能力，更不是 288 次模型实验。
+
+- [编程类九仓调查](system-survey-coding.md)：Codex、Gemini、OpenCode、Cline SDK、Aider、Qwen、Pi、OpenHands 与 Goose。
+- [框架十二仓调查](system-survey-frameworks.md)：LangChain/LangGraph 两种语言、AutoGen、Agent Framework、Semantic Kernel、OpenAI Agents SDK 两种语言、ADK、smolagents 与 Pydantic AI。
+- [系统与应用框架十一仓调查](system-survey-systems.md)：OpenClaw、Hermes、Browser Use、Deep Agents、CrewAI、Agno、AgentScope、CAMEL、LlamaIndex、Letta 与 Mastra。
+
+调查注明静态代码、委托接口、可选配置及未验证范围。OpenHands 的后端委托与 Letta 原占位版本/现行补充版本尤其不可混写；没有新增模型端到端成绩。
+
 ## 动作、状态与工具
 
 - [Pi 与 Deep Agents 的执行过程](pi-deepagents-execution.md)：一批工具怎样准备、执行和反馈，默认能力怎样装配，子任务继承哪些状态。对应 [可靠执行系统](../../book/12-action-boundaries.md) 与 [上下文系统](../../book/13-context-and-defaults.md)。

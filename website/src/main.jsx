@@ -1,18 +1,16 @@
-import React, { Children, useEffect, useId, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import Markdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import rehypeSlug from 'rehype-slug';
-import readingBlocks from './reading-blocks';
+import { BookMarkdown } from './reading-content';
+import { PrintBook } from './print-book';
 import {
   ArrowDown, ArrowLeft, ArrowRight, ArrowUpRight, BookOpen, Books,
-  Check, Code, Copy, FileText, GithubLogo, List, MagnifyingGlass,
+  Code, FileText, GithubLogo, List, MagnifyingGlass,
   Monitor, Moon, Sun, TextAa, UsersThree, ShieldCheck, X,
 } from '@phosphor-icons/react';
 import data from './content.json';
 import './styles.css';
 
-const GITHUB = 'https://github.com/Mar-garet/agent_book';
+const GITHUB = 'https://github.com/Mar-garet/agent-book';
 const AUTHOR = 'https://github.com/Mar-garet';
 const chapters = data.phases.flatMap((phase) => phase.chapters);
 const documents = new Map(data.documents.map((doc) => [doc.id, doc]));
@@ -165,12 +163,12 @@ function Home({ lastRead }) {
 }
 
 function Footer() {
-  return <footer className="footer"><span>理解 Agent 的设计思想。</span><a href={AUTHOR} target="_blank" rel="noreferrer">Mar-garet<Icon icon={ArrowUpRight} size={14} /></a></footer>;
+  return <footer className="footer"><span>理解 Agent 的设计思想。</span><a href="?page=print">打印全书<Icon icon={FileText} size={14} /></a><a href={AUTHOR} target="_blank" rel="noreferrer">Mar-garet<Icon icon={ArrowUpRight} size={14} /></a></footer>;
 }
 
 function Contents({ visited }) {
   return <main className="contents-page page-content" id="main-content" tabIndex={-1}>
-    <header className="page-heading"><p className="eyebrow">全书目录</p><h1>从零，到设计深处。</h1><p>先循序渐进地建立概念，再按记忆、上下文、工具、协作与可靠执行深入。</p></header>
+    <header className="page-heading"><p className="eyebrow">全书目录</p><h1>从零，到设计深处。</h1><a className="inline-link" href="?page=print">打印全书 / 保存 PDF<Icon icon={FileText} size={18} /></a><p>先循序渐进地建立概念，再按记忆、上下文、工具、协作与可靠执行深入。</p></header>
     <nav className="topic-jump-links" aria-label="系统专题快捷跳转">{data.phases.map((phase, index) => phase.kind === 'topic' && <a key={phase.title} href={`#phase-${index}`}>{phase.title}<Icon icon={ArrowDown} size={14} /></a>)}</nav>
     {data.phases.map((phase, index) => <React.Fragment key={phase.title}>
       {(index === 0 || phase.kind !== data.phases[index - 1].kind) && <div className="contents-part"><span className="small-label">{phase.kind === 'topic' ? 'PART II' : 'PART I'}</span><h2>{phase.kind === 'topic' ? '专题篇 · 比较实现，理解系统设计' : '基础篇 · 从零建立共同语言'}</h2><p>{phase.kind === 'topic' ? '从同一组问题出发，比较不同项目的选择，再沿机制、取舍与失败方式深入。' : '沿一个逐渐复杂的任务，理解 Agent 的参与者、执行过程与基本能力。'}</p></div>}
@@ -214,63 +212,6 @@ function Projects({ initialQuery }) {
   </main>;
 }
 
-function MermaidDiagram({ code, theme }) {
-  const id = useId().replace(/[^a-z0-9]/gi, '');
-  const [result, setResult] = useState({ code: '', svg: '', error: false });
-  const [expanded, setExpanded] = useState(false);
-  useEffect(() => {
-    let cancelled = false;
-    import('mermaid').then(async ({ default: mermaid }) => {
-      const palette = getComputedStyle(document.documentElement);
-      const color = (name) => palette.getPropertyValue(name).trim();
-      const ink = color('--ink');
-      const paper = color('--paper');
-      const surface = color('--feature');
-      const line = color('--secondary');
-      mermaid.initialize({
-        startOnLoad: false, securityLevel: 'strict', theme: 'base', suppressErrorRendering: true,
-        fontFamily: 'system-ui, sans-serif',
-        themeVariables: {
-          darkMode: theme === 'dark', useGradient: false,
-          background: paper, primaryColor: surface, secondaryColor: paper, tertiaryColor: surface,
-          primaryTextColor: ink, secondaryTextColor: ink, tertiaryTextColor: ink, textColor: ink,
-          primaryBorderColor: line, secondaryBorderColor: line, tertiaryBorderColor: line,
-          lineColor: line, edgeLabelBackground: paper, titleColor: ink,
-          stateBkg: surface, stateLabelColor: ink, labelBackgroundColor: paper,
-          noteBkgColor: surface, noteTextColor: ink, noteBorderColor: line,
-        },
-      });
-      const { svg } = await mermaid.render(`diagram${id}`, code);
-      if (!cancelled) setResult({ code, svg, error: false });
-    }).catch(() => { if (!cancelled) setResult({ code, svg: '', error: true }); });
-    return () => { cancelled = true; };
-  }, [code, theme, id]);
-  const title = code.match(/^%%\s+(.+)/)?.[1] || '执行过程与责任流转';
-  const naturalWidth = Number(result.svg.match(/viewBox="[^"]*? ([\d.]+) [\d.]+"/)?.[1]) || 680;
-  return <figure className={expanded ? 'diagram diagram-expanded' : 'diagram'} style={{ '--diagram-width': `${Math.max(680, naturalWidth)}px` }}>
-    <figcaption><span>图解</span>{title}</figcaption>
-    <div className="diagram-controls"><span>{expanded ? '可左右滚动查看细节' : '可放大查看细节'}</span><button type="button" aria-pressed={expanded} onClick={() => setExpanded(!expanded)}>{expanded ? '适应宽度' : '放大图表'}</button></div>
-    {result.code === code && result.svg ? <div className="diagram-image" tabIndex={0} role="img" aria-label={title} dangerouslySetInnerHTML={{ __html: result.svg }} />
-      : <p className="diagram-status" role="status">{result.error ? '流程图暂未显示，可以展开文字源码。' : '正在绘制流程图…'}</p>}
-    <details><summary>查看图表源码</summary><pre tabIndex={0} aria-label="图表源码"><code>{code}</code></pre></details>
-  </figure>;
-}
-
-function CodeBlock({ children }) {
-  const [copied, setCopied] = useState(false);
-  const [failed, setFailed] = useState(false);
-  const timer = useRef();
-  useEffect(() => () => clearTimeout(timer.current), []);
-  async function copy() {
-    try {
-      await navigator.clipboard.writeText(String(Children.toArray(children)[0]?.props?.children || ''));
-      setCopied(true); setFailed(false);
-      clearTimeout(timer.current); timer.current = setTimeout(() => setCopied(false), 2000);
-    } catch { setFailed(true); }
-  }
-  return <div className="code-block"><button className="code-copy" onClick={copy} aria-label={copied ? '已复制代码' : '复制代码'}><Icon icon={copied ? Check : Copy} size={16} />{copied ? '已复制' : '复制'}</button><pre tabIndex={0} aria-label="代码示例">{children}</pre>{failed && <span className="copy-error" role="status">复制失败，请选择文本后复制。</span>}</div>;
-}
-
 function Reader({ doc, theme, fontSize, setFontSize }) {
   const [activeHeading, setActiveHeading] = useState('');
   const [body, setBody] = useState(() => bodyCache.has(doc.id) ? { text: bodyCache.get(doc.id) } : {});
@@ -303,22 +244,9 @@ function Reader({ doc, theme, fontSize, setFontSize }) {
     }
     return () => observer.disconnect();
   }, [doc.id, body.text]);
-  const components = useMemo(() => ({
-    a: ({ href, children }) => {
-      const target = resolveLink(href, doc);
-      const external = /^https?:/.test(target || '');
-      return <a href={target} target={external ? '_blank' : undefined} rel={external ? 'noreferrer' : undefined}>{children}</a>;
-    },
-    table: ({ children }) => <div className="table-scroll" tabIndex={0} role="region" aria-label="对照表"><table>{children}</table></div>,
-    pre: ({ children }) => {
-      const child = Children.toArray(children)[0];
-      if (child?.props?.className === 'language-mermaid') return <MermaidDiagram code={String(child.props.children).trim()} theme={theme} />;
-      return <CodeBlock>{children}</CodeBlock>;
-    },
-  }), [doc, theme]);
   const markdown = useMemo(() => body.text !== undefined
-    ? <Markdown remarkPlugins={[remarkGfm, readingBlocks]} rehypePlugins={[rehypeSlug]} components={components}>{body.text}</Markdown>
-    : null, [body.text, components]);
+    ? <BookMarkdown text={body.text} doc={doc} theme={theme} resolveLink={resolveLink} />
+    : null, [body.text, doc, theme]);
   return <main className="reader-page" id="main-content" tabIndex={-1} style={{ '--reading-size': `${fontSize}px` }}>
     <div className="reading-progress" aria-hidden="true" />
     <div className="reader-grid">
@@ -327,7 +255,7 @@ function Reader({ doc, theme, fontSize, setFontSize }) {
           <div className="breadcrumbs"><a href="?page=contents">全书目录</a><span>/</span><span>{phase?.title || doc.kind}</span></div>
           <div className="article-meta"><span>{phase?.kind === 'topic' ? '系统专题' : doc.number === null ? doc.kind : doc.number === 0 ? '开篇' : `第 ${doc.number} 章`}</span><span>约 {doc.minutes} 分钟</span></div>
           <h1>{doc.displayTitle}</h1>
-          <div className="article-tools"><span>对照源码，理解设计取舍。</span><div className="font-controls" role="group" aria-label="正文字号"><Icon icon={TextAa} size={18} /><button disabled={fontSize <= 16} onClick={() => setFontSize(fontSize - 1)} aria-label="减小字号">小</button><button disabled={fontSize >= 23} onClick={() => setFontSize(fontSize + 1)} aria-label="增大字号">大</button></div></div>
+          <div className="article-tools"><span>理解问题，比较设计取舍。</span><div className="font-controls" role="group" aria-label="正文字号"><Icon icon={TextAa} size={18} /><button disabled={fontSize <= 16} onClick={() => setFontSize(fontSize - 1)} aria-label="减小字号">小</button><button disabled={fontSize >= 23} onClick={() => setFontSize(fontSize + 1)} aria-label="增大字号">大</button></div></div>
         </header>
         {phase?.kind === 'topic' && phase.chapters.length > 1 && <details className="topic-reading-list"><summary>本专题的 {phase.chapters.length} 篇文章</summary><nav aria-label="本专题文章">{phase.chapters.map((chapter) => <a key={chapter.id} href={hrefFor(chapter.id)} aria-current={doc.id === chapter.id ? 'page' : undefined}>{chapter.title}</a>)}</nav></details>}
         <div className="prose">{body.text !== undefined ? markdown
@@ -420,7 +348,7 @@ function App() {
       setLastRead(doc.id); writeSetting('last-read', doc.id);
       setVisited((current) => { const next = current.includes(doc.id) ? current : [...current, doc.id]; writeSetting('visited', next); return next; });
     }
-    document.title = doc ? `${doc.displayTitle} · Agent Book` : route.page === 'projects' ? '开源项目地图 · Agent Book' : route.page === 'contents' ? '全书目录 · Agent Book' : 'Agent Book · Agent 的设计思想';
+    document.title = doc ? `${doc.displayTitle} · Agent Book` : route.page === 'projects' ? '开源项目地图 · Agent Book' : route.page === 'print' ? 'Agent Book · 全书打印' : route.page === 'contents' ? '全书目录 · Agent Book' : 'Agent Book · Agent 的设计思想';
   }, [doc, route.page]);
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -449,8 +377,8 @@ function App() {
 
   const themeIcon = themePreference === 'system' ? Monitor : themePreference === 'dark' ? Moon : Sun;
   const themeLabel = themePreference === 'system' ? '跟随系统' : themePreference === 'dark' ? '深色' : '浅色';
-  const isHome = !route.read && !['contents', 'projects'].includes(route.page);
-  return <div className={isHome ? 'app home-layout' : 'app'} onClick={followLink}>
+  const isHome = !route.read && !['contents', 'projects', 'print'].includes(route.page);
+  return <div className={isHome ? 'app home-layout' : route.page === 'print' && !route.read ? 'app print-layout' : 'app'} onClick={followLink}>
     <a className="skip-link" href="#main-content">跳到正文</a>
     <header className="site-header">
       <div className="header-brand"><button className="icon-button mobile-menu-button" aria-label="打开章节目录" aria-expanded={menuOpen} onClick={() => setMenuOpen(true)}><Icon icon={List} size={23} /></button><a className="brand" href={location.pathname}><span className="brand-mark"><Icon icon={BookOpen} size={22} /></span><span>Agent Book<span className="brand-period">.</span></span></a></div>
@@ -460,7 +388,7 @@ function App() {
     <aside className="sidebar"><Sidebar current={route.read} lastRead={lastRead} /></aside>
     <div className="main-shell">
       {route.read ? doc ? <Reader key={doc.id} doc={doc} theme={theme} fontSize={fontSize} setFontSize={setFontSize} /> : <main className="page-content empty-state" id="main-content"><h1>这一页还没有收录</h1><p>从目录回到已经写好的章节。</p><a className="button primary" href="?page=contents">全书目录<Icon icon={ArrowRight} /></a></main>
-        : route.page === 'contents' ? <Contents visited={visited} /> : route.page === 'projects' ? <Projects initialQuery={route.find} /> : <Home lastRead={lastRead} />}
+        : route.page === 'print' ? <PrintBook chapters={chapters} documents={documents} resolveLink={resolveLink} /> : route.page === 'contents' ? <Contents visited={visited} /> : route.page === 'projects' ? <Projects initialQuery={route.find} /> : <Home lastRead={lastRead} />}
     </div>
     <dialog className="mobile-drawer" ref={drawer} onCancel={(event) => { event.preventDefault(); setMenuOpen(false); }} onClick={(event) => { if (event.target === drawer.current) setMenuOpen(false); }} aria-label="章节目录"><div className="drawer-inner"><div className="drawer-title"><a className="brand" href={location.pathname}>Agent Book.</a><button className="icon-button" aria-label="关闭章节目录" onClick={() => setMenuOpen(false)}><Icon icon={X} /></button></div><Sidebar current={route.read} lastRead={lastRead} onNavigate={() => setMenuOpen(false)} /></div></dialog>
     <SearchDialog open={searchOpen} onClose={() => setSearchOpen(false)} />
