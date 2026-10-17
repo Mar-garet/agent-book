@@ -19,13 +19,7 @@
 </p>
 
 <p align="center">
-  <a href="https://mar-garet.github.io/agent_book/"><strong>在线阅读 ↗</strong></a>
-  &nbsp; · &nbsp;
-  <a href="book/README.md">目录</a>
-  &nbsp; · &nbsp;
-  <a href="book/10-project-comparisons.md">项目地图</a>
-  &nbsp; · &nbsp;
-  <a href="references/evidence.md">证据索引</a>
+  <a href="https://mar-garet.github.io/agent_book/"><strong>在线阅读 ↗</strong></a> · <a href="book/README.md">目录</a> · <a href="book/10-project-comparisons.md">项目地图</a> · <a href="references/evidence.md">证据索引</a>
 </p>
 
 ---
