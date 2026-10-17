@@ -1,6 +1,19 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
+test('Chinese emphasis renders without leaking Markdown punctuation into prose', async ({ page }) => {
+  for (const [id, label] of [
+    ['book/00-do-you-really-understand-agents', '带着一个问题进入下一章'],
+    ['book/10-project-comparisons', '已核对的事实'],
+    ['references/studies/tool-results-and-retries', '默认策略不是捕获所有工具执行异常'],
+    ['references/studies/trust-and-tool-content', '来源提示与技术强制的边界'],
+  ]) {
+    await page.goto(`/?read=${encodeURIComponent(id)}`);
+    await expect(page.locator('.prose strong').filter({ hasText: label }).first()).toBeVisible();
+    await expect(page.locator('.prose')).not.toContainText('**');
+  }
+});
+
 test('search opens a chapter, follows its sources and preserves browser navigation', async ({ page }) => {
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));

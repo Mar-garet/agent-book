@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "node scripts/content.mjs && vite --host 127.0.0.1 --port 4173 --strictPort",
-    "build": "node scripts/content.mjs && vite build",
+    "build": "npm run check:markdown && node scripts/content.mjs && vite build",
+    "check:markdown": "node scripts/check-markdown.mjs",
     "preview": "vite preview --host 127.0.0.1 --port 4173 --strictPort",
     "test": "playwright test",
     "previews": "node scripts/export-previews.mjs"
