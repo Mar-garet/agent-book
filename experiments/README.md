@@ -6,6 +6,32 @@ LangGraph 与 SDK 实验运行已下载的固定源码；Pi 实验调用真实�
 
 [实验清单](manifest.json) 将每组脚本、结果与依赖锁关联起来。结果文件记录运行时间、环境、源码提交和脚本摘要；书稿校验会检查这些记录与当前文件是否一致。
 
+## 先运行一个无需模型的样例
+
+离线验收样例只使用 Python 标准库，无需模型密钥、第三方依赖或上游子模块。已有 Python 3.12 的读者可以在仓库根目录直接运行：
+
+```bash
+python3 experiments/task_acceptance.py
+```
+
+脚本将九个构造样例的结果输出为 JSON。先看每个样例的 `candidate_claim`（预设完成声明）、`observation.job_status`（服务状态）与 `contract_assessment`（验收结论）：
+
+| 构造样例 | 预设声明 | 服务状态 | 验收结论 |
+| --- | --- | --- | --- |
+| `queued_receipt` | `done` | `queued` | `waiting`：尚无最终产物 |
+| `missing_date` | `done` | `completed` | `rejected`：日期不完整 |
+| `verified_completion` | `done` | `completed` | `accepted`：满足所写条件 |
+
+同样一句“完成了”，可以对应三个不同结果。这个程序展示应用怎样独立检查产物；所有输入都是人工构造，没有让模型执行报表任务。无需先配置服务，也能看到本书讨论的运行结束与业务完成之间的差别。
+
+如需保留自己的输出，写入临时目录，避免覆盖随书发布的实验记录：
+
+```bash
+python3 experiments/task_acceptance.py --output .downloads/first-acceptance.json
+```
+
+完整验收设计见[评测系统](../book/22-evaluation-and-completion.md)。其他四组实验调用固定版本的上游实现，需要下文所述环境。
+
 ## 中断与恢复
 
 这一组包含四个场景。模拟审查服务保存在图状态之外，用来观察业务效果与节点状态的交付差异。

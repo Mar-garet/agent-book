@@ -1,53 +1,59 @@
 <p align="center">
-  <img src="docs/assets/agent-book-logo.png" alt="Agent Book Logo" width="160">
+  <img src="docs/assets/agent-book-logo.png" alt="Agent Book" width="144">
 </p>
 
 <h1 align="center">Agent Book</h1>
 
-<p align="center"><strong>从开源实现理解 AI Agent 的工作方式与设计取舍</strong></p>
+<p align="center"><strong>Understand the design choices behind AI agents.</strong></p>
+
+<p align="center">An open book in Chinese · 23 chapters · 5 system topics · Principles, mechanisms, and trade-offs</p>
 
 <p align="center">
-  <a href="https://mar-garet.github.io/agent_book/?read=book%2F00-do-you-really-understand-agents">开始阅读 →</a> ·
-  <a href="book/README.md">全书目录</a> ·
-  <a href="references/studies/README.md">源码研究</a>
+  <a href="https://mar-garet.github.io/agent_book/">Read the book →</a>
 </p>
 
-## 这本书在讲什么
+---
 
-一个 Agent 收到任务之后，怎样决定下一步、调用工具、根据结果继续行动，直到完成工作？任务中途失败、上下文装不下、需要其他 Agent 接手时，系统又该怎么办？
+How do agents use tools, remember information, plan tasks, and work together? What does their design need to account for when tasks grow longer, tools fail, or execution stops halfway through?
 
-**Agent Book 是一本从零到深入理解 AI Agent 的开源中文书**。它从这些具体问题出发，解释模型、工具和运行系统如何配合，以及不同设计在能力、成本与可靠性之间的取舍。
+**Agent Book puts design thinking first.** It starts with how agents work, then examines why they are built that way, what alternatives exist, and when each choice makes sense.
 
-贯穿全书的是四个问题：**谁决定下一步，谁执行行动，谁保存状态，谁检查结果？**
+Open-source projects—including Pi, Codex, LangGraph, Deep Agents, Hermes, and OpenClaw—provide concrete cases. Source code and experiments ground the discussion, helping you apply the underlying ideas to your own systems.
 
-## 适合谁读
+## The approach
 
-- **刚接触 Agent 的读者**：建立模型、工具、上下文和记忆之间的关系，理解 Agent 为什么能持续行动。
-- **正在使用 Agent 的开发者**：理解工具失败、摘要丢失信息、恢复后重复执行等现象，判断能力和限制来自哪里。
-- **准备构建 Agent 系统的工程师**：思考如何安排规划与协作、控制权限和预算，以及怎样验收任务结果。
+**Start with a problem.** Take memory: what deserves to be remembered? How should outdated facts expire? Which version of a rule applies to a historical task? Compare how Hermes, OpenClaw, and LangGraph handle these questions, then reason about your own storage, retrieval, and update policies.
 
-## 你会读到什么
+**Explain the choices and their costs.** When should a model choose the next step, and when should the application fix the workflow? When is another agent worth the coordination cost? Each discussion connects goals and constraints to alternatives, trade-offs, and failure modes.
 
-### 从一次回答，到一个行动循环
+**Use implementation as evidence.** Code clarifies key mechanisms. Experiments reveal boundaries that intuition can miss. The prose explains the design; linked sources let you investigate further.
 
-先分清模型与运行系统的职责，再追踪一次完整的“观察 → 决定 → 行动 → 反馈”。理解是谁让任务继续，又是谁让它停下来。
+## Inside the book
 
-### 从调用工具，到组织知识与分工
+The foundations introduce models, tools, and the agent loop, then build toward MCP, context, memory, planning, Skills, and multi-agent systems. Five deeper topics connect these concepts to system design:
 
-工具调用与 MCP 解决系统怎样接触外部世界；上下文与记忆决定模型此刻能看见什么；规划、Skills 和多 Agent 协作则决定经验与分工怎样进入执行过程。
+| Topic | Design questions |
+| --- | --- |
+| **Memory** | What to store, when to retrieve it, how to update it, and where it applies |
+| **Context** | What the next model call should see; how to handle long outputs, compression, and information loss |
+| **Tools & MCP** | How discovery, authorization, execution, and result handling fit together; what to retry |
+| **Collaboration** | When to delegate or hand off; how to divide work, reconcile evidence, and verify a shared result |
+| **Reliable execution & evaluation** | How approval, recovery, trust, budgets, and task acceptance work together |
 
-### 从演示成功，到长期可靠地工作
+![Agent Book reader showing the foundations and five system topics](docs/assets/reader-system-topics.webp)
 
-沿取消与审批、错误与重试、中断与恢复、摘要与交接等问题深入，理解副作用、信任边界和资源预算，最后回到任务验收与评测：怎样证明 Agent 真的完成了工作？
+## Who it is for
 
-## 这本书怎样展开
+- **New to agents?** Follow the foundations to understand how models, tools, and runtimes work together.
+- **Already using agents?** Explore the mechanisms behind stale memory, lost context, and duplicate actions after retries or recovery.
+- **Designing an agent system?** Compare approaches and decide what the model should control, what the application should enforce, and how to manage state, permissions, and acceptance.
 
-书中用一个逐渐复杂的任务情境串起概念，再以 Pi、Codex、LangGraph、Deep Agents、Hermes、OpenClaw 等开源项目的具体实现解释机制。案例围绕问题组织，源码用于核对论断，实验用于观察执行行为。
+You can read the book without installing a framework or obtaining a model API key. Source studies and experiment instructions provide a separate path for deeper investigation. **The book itself is currently written in Chinese.**
 
-**源码事实、设计推断和实验结果分别说明**。每项项目研究保留固定版本与来源，便于读者继续追查。
+## Sources and experiments
 
-## 从哪里开始
+Claims about project behavior link to local source material and pinned commits. Companion studies trace the relevant execution paths. **Five experiment groups, with 31 deterministic scenarios**, examine recovery, tool retries, delegation budgets, summary inputs, and acceptance rules using scripted inputs or simulated services.
 
-第一次接触 Agent，建议从[开篇：你真的懂 Agent 吗？](book/00-do-you-really-understand-agents.md)顺序阅读。已有使用经验，可以通过[全书目录](book/README.md)选择关心的问题，或先读[项目比较](book/10-project-comparisons.md)，再回到具体机制。
+Teaching scenarios, design inferences, and observed results are identified separately. The running case connects the design discussions; it has not been evaluated as an end-to-end task with a real model.
 
-想继续核对实现和实验，可以查看[源码研究记录](references/studies/README.md)、[机制实验与复现](experiments/README.md)和[上游项目及版本](docs/source-catalog.md)。
+[Table of contents](book/README.md) · [Source studies](references/studies/README.md) · [Experiments & reproduction](experiments/README.md)
