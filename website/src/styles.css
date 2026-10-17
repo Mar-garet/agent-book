@@ -469,3 +469,107 @@ dialog::backdrop { background: rgb(28 30 24 / .34); backdrop-filter: blur(3px); 
   .system-topic-card { padding: 20px; }
   .system-topic-card h3 { font-size: 23px; }
 }
+
+/* The home is a book landing; the chapter sidebar belongs to the reading view. */
+.home-layout .sidebar { display: none; }
+.home-layout .main-shell { margin-left: 0; }
+.home-layout .site-header { padding-inline: max(32px, calc((100vw - 1220px) / 2)); }
+.home-layout .header-brand { width: auto; margin-right: 30px; }
+.home-page { max-width: 1348px; padding-inline: 64px; }
+.home-page .hero { grid-template-columns: minmax(0, .95fr) minmax(0, 1.15fr); min-height: 590px; gap: 40px; padding: 58px 0 38px; }
+.home-page .eyebrow { font-size: 13px; letter-spacing: .06em; margin-bottom: 27px; }
+.home-page .hero h1 { font-size: clamp(48px, 4.8vw, 68px); line-height: 1.25; letter-spacing: -.035em; margin-bottom: 26px; }
+.home-page .hero-description { font-size: 16px; line-height: 1.95; }
+.home-page .hero-actions { margin-top: 32px; gap: 28px; }
+.home-page .button { font-size: 14px; min-height: 48px; padding: 14px 20px; border-radius: 4px; }
+.home-page .text-button { padding-inline: 0; }
+.home-page .hero-art { margin: 0; width: 100%; max-width: none; }
+.home-page .hero-art img { display: block; width: 100%; height: auto; max-height: none; mix-blend-mode: normal; }
+[data-theme='dark'] .home-page .hero-art img { filter: invert(1) hue-rotate(180deg); }
+.hero-art figcaption { text-align: center; font-size: 12px; line-height: 1.8; color: var(--muted); margin-top: 14px; }
+.book-introduction { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 90px; padding: 34px 0 38px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.book-idea { max-width: 690px; }
+.book-idea h2 { margin: 0 0 14px; font-size: 19px; line-height: 1.6; font-weight: 500; }
+.book-idea p { margin: 0; color: var(--secondary); font-size: 14px; line-height: 1.95; }
+.home-page .book-facts { display: flex; gap: 42px; padding: 0; margin: 0; min-height: 0; border: 0; }
+.book-facts > div { display: flex; flex-direction: column-reverse; gap: 12px; }
+.book-facts dt { color: var(--secondary); font-size: 12px; white-space: nowrap; }
+.book-facts dd { margin: 0; font: 400 48px/1 'Newsreader Variable', Georgia, serif; letter-spacing: -.03em; color: var(--ink); }
+.foundations-section { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.65fr); gap: 90px; padding: 70px 0; }
+.foundation-intro h2 { font: 500 34px/1.5 'Songti SC', 'STSong', serif; letter-spacing: -.025em; margin: 0 0 19px; }
+.foundation-intro > p { font-size: 14px; line-height: 1.9; color: var(--secondary); max-width: 300px; margin: 0; }
+.home-page .opening-feature { display: inline-flex; align-items: center; gap: 10px; margin-top: 22px; padding: 8px 0; background: none; color: var(--accent); font-size: 13px; border-radius: 0; min-height: 44px; }
+.home-page .opening-feature:hover { color: var(--ink); }
+.home-page .reading-routes { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0; }
+.home-page .reading-route { grid-template-columns: 30px minmax(0, 1fr) 20px; gap: 20px; padding: 22px 0; border-top: 0; border-bottom: 1px solid var(--line); }
+.home-page .reading-route:first-child { padding-top: 0; }
+.home-page .reading-route:last-child { grid-column: auto; border-bottom: 0; padding-bottom: 0; }
+.home-page .reading-route h3 { font-size: 16px; margin-bottom: 9px; }
+.home-page .reading-route p { font-size: 12px; line-height: 1.8; color: var(--secondary); }
+.home-page .route-index { font-size: 21px; color: var(--muted); }
+.home-page .system-topics-section { padding: 54px 0 56px; }
+.home-page .section-heading { margin-bottom: 30px; }
+.home-page .section-heading h2, .home-page .deep-intro h2 { font: 500 32px/1.5 'Songti SC', 'STSong', serif; margin: 0 0 13px; }
+.home-page .section-heading p { font-size: 14px; }
+.home-page .system-topic-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0; }
+.home-page .system-topic-card { display: grid; grid-template-columns: 44px minmax(200px, .95fr) minmax(0, 1.35fr) 100px; align-items: center; gap: 25px; grid-column: auto; padding: 28px 0; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; background: none; }
+.home-page .system-topic-card:last-child { border-bottom: 0; }
+.home-page .system-topic-card:hover { background: none; }
+.home-page .system-topic-card:hover h3, .home-page .system-topic-card:hover .topic-symbol { color: var(--accent); }
+.topic-symbol { color: var(--secondary); display: inline-flex; }
+.home-page .system-topic-card h3 { margin: 0 0 7px; font: 500 23px/1.5 'Songti SC', 'STSong', serif; }
+.home-page .topic-name p { font-size: 13px; margin: 0; color: var(--secondary); line-height: 1.8; }
+.home-page .system-topic-card .topic-description { font-size: 13px; line-height: 1.9; margin: 0; max-width: 420px; }
+.home-page .topic-card-link { margin: 0; font-size: 12px; gap: 12px; justify-content: flex-end; }
+.home-page .deep-section { display: block; padding: 48px 0 64px; margin-top: 0; }
+.home-page .deep-intro p { max-width: none; font-size: 14px; margin: 0 0 30px; }
+.home-page .deep-stories { gap: 36px; }
+.home-page .deep-stories a { padding: 30px 34px; background: var(--feature); border-radius: 4px; }
+.home-page .deep-stories a:last-child { background: var(--feature); }
+.home-page .deep-stories h3 { font-size: 27px; margin: 20px 0 18px; }
+.home-page .deep-stories p { font-size: 14px; line-height: 1.9; max-width: 400px; }
+.story-read { display: inline-flex; align-items: center; gap: 13px; color: var(--accent); font-size: 13px; margin-top: 25px; min-height: 32px; }
+.home-page .footer { padding-block: 25px 32px; font-size: 12px; }
+@media (max-width: 1100px) {
+  .home-page { padding-inline: 44px; }
+  .home-page .hero { min-height: 500px; gap: 24px; }
+  .home-page .hero h1 { font-size: 54px; }
+  .book-introduction { gap: 40px; }
+  .foundations-section { gap: 45px; }
+  .home-page .system-topic-card { grid-template-columns: 36px minmax(180px, 1fr) minmax(0, 1.2fr) 22px; gap: 20px; }
+  .home-page .topic-card-link span { display: none; }
+}
+@media (max-width: 767px) {
+  .home-layout .site-header { padding-inline: 16px; }
+  .home-layout .header-brand { margin-right: 0; }
+  .home-page { padding-inline: 24px; }
+  .home-page .hero { grid-template-columns: minmax(0, 1fr); gap: 26px; padding: 40px 0 28px; min-height: 0; }
+  .home-page .eyebrow { font-size: 11px; margin-bottom: 20px; }
+  .home-page .hero h1 { font-size: clamp(42px, 8.7vw, 58px); margin-bottom: 22px; }
+  .home-page .hero-description { font-size: 14px; }
+  .home-page .hero-actions { gap: 24px; margin-top: 24px; }
+  .home-page .hero-art { max-width: 500px; }
+  .hero-art figcaption { font-size: 11px; margin-top: 5px; }
+  .book-introduction { grid-template-columns: minmax(0, 1fr); gap: 26px; padding: 28px 0; }
+  .book-idea h2 { font-size: 18px; }
+  .home-page .book-facts { gap: 40px; }
+  .book-facts > div { flex-direction: row-reverse; align-items: baseline; gap: 9px; }
+  .book-facts dd { font-size: 30px; }
+  .foundations-section { grid-template-columns: minmax(0, 1fr); padding: 42px 0; gap: 30px; }
+  .foundation-intro h2 { font-size: 29px; }
+  .foundation-intro h2 br { display: none; }
+  .foundation-intro > p { max-width: 440px; }
+  .home-page .opening-feature { margin-top: 14px; }
+  .home-page .reading-route { gap: 16px; padding-block: 20px; }
+  .home-page .system-topics-section { padding: 36px 0; }
+  .home-page .section-heading h2, .home-page .deep-intro h2 { font-size: 27px; }
+  .home-page .system-topic-card { grid-template-columns: 30px minmax(0, 1fr) 20px; gap: 16px; padding-block: 24px; }
+  .home-page .system-topic-card h3 { font-size: 22px; }
+  .home-page .system-topic-card .topic-description { display: none; }
+  .home-page .topic-name p { font-size: 12px; }
+  .home-page .deep-section { padding-block: 35px 44px; }
+  .home-page .deep-stories { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+  .home-page .deep-stories a { padding: 25px; }
+  .home-page .deep-stories h3 { font-size: 25px; }
+  .home-page .deep-stories h3 br { display: none; }
+}

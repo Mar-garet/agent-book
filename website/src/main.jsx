@@ -7,7 +7,7 @@ import readingBlocks from './reading-blocks';
 import {
   ArrowDown, ArrowLeft, ArrowRight, ArrowUpRight, BookOpen, Books,
   Check, Code, Copy, FileText, GithubLogo, List, MagnifyingGlass,
-  Monitor, Moon, Sun, TextAa, X,
+  Monitor, Moon, Sun, TextAa, UsersThree, ShieldCheck, X,
 } from '@phosphor-icons/react';
 import data from './content.json';
 import './styles.css';
@@ -95,60 +95,69 @@ function Sidebar({ current, lastRead, onNavigate }) {
 function Home({ lastRead }) {
   const last = documents.get(lastRead);
   const start = last ? last.id : FIRST;
+  const topics = data.phases.filter((phase) => phase.kind === 'topic');
+  const topicIcons = [Books, TextAa, Code, UsersThree, ShieldCheck];
+  const topicQuestions = [
+    '记住什么，什么时候更新？',
+    '下一步判断，需要看见什么？',
+    '连接之后，谁负责执行？',
+    '更多 Agent，怎样共同交付？',
+    '怎样确认它真的做完了？',
+  ];
   return <main className="home-page page-content" id="main-content" tabIndex={-1}>
-    <section className="hero">
+    <section className="hero" aria-labelledby="home-title">
       <div className="hero-copy">
-        <p className="eyebrow">一本关于 Agent 的书</p>
-        <h1>你真的懂 <span>Agent 吗？</span></h1>
-        <p className="hero-description">从一次工具调用，走到一个系统的设计。<br />从零开始，理解行动、记忆、协作与恢复。</p>
+        <p className="eyebrow">一本关于 Agent 设计思想的开源书</p>
+        <h1 id="home-title">理解 Agent，<span>从设计开始。</span></h1>
+        <p className="hero-description">从问题、约束与取舍出发，<br />理解记忆、工具、协作与可靠执行。</p>
         <div className="hero-actions">
           <a className="button primary" href={hrefFor(start)}>{last ? '继续阅读' : '开始阅读'}<Icon icon={ArrowRight} size={18} /></a>
-          <a className="button text-button" href="?page=contents">全书目录<Icon icon={ArrowDown} size={17} /></a>
+          <a className="button text-button" href="?page=contents">全书目录<Icon icon={ArrowRight} size={17} /></a>
         </div>
       </div>
-      <div className="hero-art"><img src="./assets/agent-loop.webp" alt="纸带、石墨色球体和朱红色方块组成一个开放的行动循环" width="1200" height="800" fetchPriority="high" /></div>
+      <figure className="hero-art">
+        <img src="./assets/agent-design-paths.webp" srcSet="./assets/agent-design-paths-640.webp 640w, ./assets/agent-design-paths.webp 1440w" sizes="(max-width: 767px) calc(100vw - 48px), (max-width: 1348px) 52vw, 640px" alt="朱红色路径穿过分层建筑结构，象征目标、约束与不同的设计选择" width="1536" height="1024" fetchPriority="high" />
+        <figcaption>同一个目标，可以有不同的设计路径。</figcaption>
+      </figure>
     </section>
 
-    <div className="book-facts" aria-label="书稿概况">
-      <span><strong>{chapters.length}</strong> 篇正文</span><span><strong>{data.projects.length}</strong> 个开源项目</span><span>从概念到真实机制</span>
-    </div>
-
-    <section className="opening-section">
-      <div className="section-heading"><h2>先问一个好问题</h2><p>让系统真正做成事，比让模型说出下一步更难。</p></div>
-      <a className="opening-feature" href={hrefFor(FIRST)}>
-        <div className="opening-mark" aria-hidden="true">“</div>
-        <div><span className="small-label">开篇</span><h3>它回答得很好。<br />可事情真的做完了吗？</h3><p>从一次看似成功的任务，追问模型、工具与运行系统分别做了什么。</p></div>
-        <span className="round-arrow"><Icon icon={ArrowUpRight} size={25} /></span>
-      </a>
+    <section className="book-introduction" aria-labelledby="book-idea">
+      <div className="book-idea"><h2 id="book-idea">把 Agent 看成一组设计选择。</h2><p>哪些判断交给模型，哪些规则由程序守住？从具体问题出发，比较不同方案，理解一种设计为什么成立，又会在哪里失效。开源实现与实验，为这些判断提供依据。</p></div>
+      <dl className="book-facts" aria-label="书稿概况"><div><dt>篇正文</dt><dd>{chapters.length}</dd></div><div><dt>个系统专题</dt><dd>{topics.length}</dd></div></dl>
     </section>
 
-    <section className="routes-section">
-      <div className="section-heading"><h2>先建立共同语言</h2><p>沿一个逐渐复杂的任务，理解 Agent 怎样持续行动。</p></div>
+    <section className="foundations-section" aria-labelledby="foundations-title">
+      <div className="foundation-intro">
+        <h2 id="foundations-title">先理解，<br />它如何工作。</h2>
+        <p>从一次回答，到持续行动。循序渐进地建立概念，再形成自己的判断。</p>
+        <a className="opening-feature" href={hrefFor(FIRST)}><BookOpen size={20} aria-hidden="true" /><span>开篇：你真的懂 Agent 吗？</span><Icon icon={ArrowUpRight} size={18} /></a>
+      </div>
       <div className="reading-routes">
         {data.phases.filter((phase) => phase.kind === 'foundation').map((phase, index) => <a href={`?page=contents#phase-${index}`} className="reading-route" key={phase.title}>
           <span className="route-index">{String(index + 1).padStart(2, '0')}</span>
-          <div><h3>{phase.title}</h3><p>{phase.chapters.length} 篇基础章节</p></div>
+          <div><h3>{phase.title}</h3><p>{phase.chapters.map((chapter) => chapter.title.replace(/：.+$/, '')).join(' / ')}</p></div>
           <Icon icon={ArrowUpRight} size={19} />
         </a>)}
       </div>
     </section>
 
     <section className="system-topics-section" aria-labelledby="system-topics-title">
-      <div className="section-heading"><h2 id="system-topics-title">再把一个系统讲透</h2><p>比较不同实现，沿调用链理解机制，再回到自己的设计。</p></div>
+      <div className="section-heading"><h2 id="system-topics-title">再追问，为什么这样设计。</h2><p>五个系统专题，从代表实现走向机制、取舍与适用边界。</p></div>
       <div className="system-topic-grid">
-        {data.phases.filter((phase) => phase.kind === 'topic').map((phase, index) => <a className="system-topic-card" key={phase.title} href={hrefFor(phase.chapters[0].id)}>
-          <span className="topic-card-index">专题 {String(index + 1).padStart(2, '0')}</span>
-          <h3>{phase.title}</h3><p>{phase.description}</p>
-          <span className="topic-card-link">进入专题<Icon icon={ArrowRight} size={18} /></span>
+        {topics.map((phase, index) => <a className="system-topic-card" key={phase.title} href={hrefFor(phase.chapters[0].id)}>
+          <span className="topic-symbol"><Icon icon={topicIcons[index]} size={28} /></span>
+          <div className="topic-name"><h3>{phase.title}</h3><p>{topicQuestions[index]}</p></div>
+          <p className="topic-description">{phase.description}</p>
+          <span className="topic-card-link"><span>进入专题</span><Icon icon={ArrowUpRight} size={20} /></span>
         </a>)}
       </div>
     </section>
 
-    <section className="deep-section">
-      <div className="deep-intro"><span className="small-label">沿真实机制深入</span><h2>理解差异，<br />才能形成判断。</h2><p>同一个问题，不同项目选择了不同答案。我们沿源码追踪，也用实验核查。</p><a className="inline-link" href="?page=projects">项目地图<Icon icon={ArrowRight} size={18} /></a></div>
+    <section className="deep-section" aria-labelledby="selected-title">
+      <div className="deep-intro"><h2 id="selected-title">从一个具体问题读起。</h2><p>看看直觉会在哪里失效，再理解设计怎样回应。</p></div>
       <div className="deep-stories">
-        <a href={hrefFor('book/14-resume-and-side-effects')}><span className="story-kind">恢复与可靠性</span><h3>从断点继续，<br />为什么会再做一遍？</h3><p>四个实际运行的受控场景，观察节点重入与业务副作用。</p><Icon icon={ArrowUpRight} /></a>
-        <a href={hrefFor('book/16-mcp-host-differences')}><span className="story-kind">MCP 与工具</span><h3>同一个服务，<br />为什么表现不同？</h3><p>比较 Goose 与 Cline SDK 怎样组织发现、审批与结果。</p><Icon icon={ArrowUpRight} /></a>
+        <a href={hrefFor('book/14-resume-and-side-effects')}><span className="story-kind">恢复与可靠性</span><h3>从断点继续，<br />为什么会再做一遍？</h3><p>检查点保存了进度，外部服务却已完成写入。拆开节点，问题就解决了吗？</p><span className="story-read">阅读这篇<Icon icon={ArrowRight} size={18} /></span></a>
+        <a href={hrefFor('book/18-context-compaction')}><span className="story-kind">上下文与信息</span><h3>压缩以后，<br />信息丢在了哪里？</h3><p>有些信息在摘要模型看见之前就已消失。换一个更强的模型，能找回来吗？</p><span className="story-read">阅读这篇<Icon icon={ArrowRight} size={18} /></span></a>
       </div>
     </section>
     <Footer />
@@ -156,7 +165,7 @@ function Home({ lastRead }) {
 }
 
 function Footer() {
-  return <footer className="footer"><span>从开源实现理解 Agent 的设计。</span><a href={AUTHOR} target="_blank" rel="noreferrer">Mar-garet<Icon icon={ArrowUpRight} size={14} /></a></footer>;
+  return <footer className="footer"><span>理解 Agent 的设计思想。</span><a href={AUTHOR} target="_blank" rel="noreferrer">Mar-garet<Icon icon={ArrowUpRight} size={14} /></a></footer>;
 }
 
 function Contents({ visited }) {
@@ -411,7 +420,7 @@ function App() {
       setLastRead(doc.id); writeSetting('last-read', doc.id);
       setVisited((current) => { const next = current.includes(doc.id) ? current : [...current, doc.id]; writeSetting('visited', next); return next; });
     }
-    document.title = doc ? `${doc.displayTitle} · Agent Book` : route.page === 'projects' ? '开源项目地图 · Agent Book' : route.page === 'contents' ? '全书目录 · Agent Book' : 'Agent Book · 你真的懂 Agent 吗？';
+    document.title = doc ? `${doc.displayTitle} · Agent Book` : route.page === 'projects' ? '开源项目地图 · Agent Book' : route.page === 'contents' ? '全书目录 · Agent Book' : 'Agent Book · Agent 的设计思想';
   }, [doc, route.page]);
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -440,7 +449,8 @@ function App() {
 
   const themeIcon = themePreference === 'system' ? Monitor : themePreference === 'dark' ? Moon : Sun;
   const themeLabel = themePreference === 'system' ? '跟随系统' : themePreference === 'dark' ? '深色' : '浅色';
-  return <div className="app" onClick={followLink}>
+  const isHome = !route.read && !['contents', 'projects'].includes(route.page);
+  return <div className={isHome ? 'app home-layout' : 'app'} onClick={followLink}>
     <a className="skip-link" href="#main-content">跳到正文</a>
     <header className="site-header">
       <div className="header-brand"><button className="icon-button mobile-menu-button" aria-label="打开章节目录" aria-expanded={menuOpen} onClick={() => setMenuOpen(true)}><Icon icon={List} size={23} /></button><a className="brand" href={location.pathname}><span className="brand-mark"><Icon icon={BookOpen} size={22} /></span><span>Agent Book<span className="brand-period">.</span></span></a></div>

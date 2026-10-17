@@ -19,7 +19,7 @@ test('search opens a chapter, follows its sources and preserves browser navigati
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto('/');
-  await expect(page.getByRole('heading', { level: 1 })).toContainText('你真的懂');
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('理解 Agent');
   await page.getByRole('button', { name: '搜索全书', exact: true }).click();
   const dialog = page.getByRole('dialog', { name: '搜索全书', exact: true });
   await dialog.getByRole('searchbox').fill('从断点继续');
@@ -53,6 +53,8 @@ test('project search and category filters preserve the fixed source snapshot', a
 });
 
 test('the public reader serves manuscripts and experiment records without GitHub access', async ({ page }) => {
+  const homeImages = [];
+  page.on('request', (request) => { if (request.url().includes('/assets/agent-design-paths')) homeImages.push(request.url()); });
   await page.goto('/?read=book%2F14-resume-and-side-effects');
   const manuscript = page.getByRole('link', { name: '下载本章 Markdown' });
   await expect(manuscript).toHaveAttribute('href', './manuscript/book/14-resume-and-side-effects.md');
@@ -63,6 +65,7 @@ test('the public reader serves manuscripts and experiment records without GitHub
   const results = await page.request.get('/downloads/experiments/results/langgraph-interrupt-replay.json');
   expect(results.ok()).toBe(true);
   expect((await results.json()).cases).toHaveLength(4);
+  expect(homeImages).toEqual([]);
   await expect(page.getByRole('link', { name: '作者 GitHub' })).toHaveAttribute('href', 'https://github.com/Mar-garet');
 });
 
@@ -135,7 +138,8 @@ for (const width of [375, 768, 1024, 1440]) {
       await page.getByRole('dialog', { name: '章节目录' }).getByRole('link', { name: /^03 / }).click();
       await expect(page.getByRole('dialog', { name: '章节目录' })).not.toBeVisible();
     } else {
-      await page.locator('.sidebar a').filter({ hasText: '工具调用' }).click();
+      await page.getByRole('navigation', { name: '主导航' }).getByRole('link', { name: '全书目录', exact: true }).click();
+      await page.locator('.contents-chapter').filter({ hasText: '工具调用' }).click();
     }
     await expect(page.getByRole('heading', { level: 1 })).toContainText('工具调用');
     await expect(page.locator('.prose h2').first()).toBeVisible();
@@ -212,6 +216,7 @@ for (const width of [375, 1440]) {
 test('home topic cards and contents shortcuts lead to the complete system articles', async ({ page }) => {
   await page.goto('/');
   await expect(page.locator('.system-topic-card')).toHaveCount(5);
+  await page.locator('.system-topics-section').screenshot({ path: 'test-results/home-system-topics.png' });
   await page.locator('.system-topic-card').filter({ hasText: '协作系统' }).click();
   await expect(page.getByRole('heading', { level: 1 })).toContainText('协作系统：');
   await page.goto('/?page=contents');
