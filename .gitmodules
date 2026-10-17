@@ -1,0 +1,128 @@
+[submodule "codex"]
+	path = codex
+	url = https://github.com/openai/codex.git
+	shallow = true
+[submodule "gemini-cli"]
+	path = gemini-cli
+	url = https://github.com/google-gemini/gemini-cli.git
+	shallow = true
+[submodule "opencode"]
+	path = opencode
+	url = https://github.com/anomalyco/opencode.git
+	shallow = true
+[submodule "cline"]
+	path = cline
+	url = https://github.com/cline/cline.git
+	shallow = true
+[submodule "aider"]
+	path = aider
+	url = https://github.com/Aider-AI/aider.git
+	shallow = true
+[submodule "qwen-code"]
+	path = qwen-code
+	url = https://github.com/QwenLM/qwen-code.git
+	shallow = true
+[submodule "pi"]
+	path = pi
+	url = https://github.com/earendil-works/pi.git
+	shallow = true
+[submodule "openhands"]
+	path = openhands
+	url = https://github.com/OpenHands/OpenHands.git
+	shallow = true
+[submodule "goose"]
+	path = goose
+	url = https://github.com/aaif-goose/goose.git
+	shallow = true
+[submodule "openclaw"]
+	path = openclaw
+	url = https://github.com/openclaw/openclaw.git
+	shallow = true
+[submodule "hermes-agent"]
+	path = hermes-agent
+	url = https://github.com/NousResearch/hermes-agent.git
+	shallow = true
+[submodule "browser-use"]
+	path = browser-use
+	url = https://github.com/browser-use/browser-use.git
+	shallow = true
+[submodule "langchain"]
+	path = langchain
+	url = https://github.com/langchain-ai/langchain.git
+	shallow = true
+[submodule "langgraph"]
+	path = langgraph
+	url = https://github.com/langchain-ai/langgraph.git
+	shallow = true
+[submodule "langchainjs"]
+	path = langchainjs
+	url = https://github.com/langchain-ai/langchainjs.git
+	shallow = true
+[submodule "langgraphjs"]
+	path = langgraphjs
+	url = https://github.com/langchain-ai/langgraphjs.git
+	shallow = true
+[submodule "deepagents"]
+	path = deepagents
+	url = https://github.com/langchain-ai/deepagents.git
+	shallow = true
+[submodule "crewai"]
+	path = crewai
+	url = https://github.com/crewAIInc/crewAI.git
+	shallow = true
+[submodule "autogen"]
+	path = autogen
+	url = https://github.com/microsoft/autogen.git
+	shallow = true
+[submodule "agent-framework"]
+	path = agent-framework
+	url = https://github.com/microsoft/agent-framework.git
+	shallow = true
+[submodule "semantic-kernel"]
+	path = semantic-kernel
+	url = https://github.com/microsoft/semantic-kernel.git
+	shallow = true
+[submodule "openai-agents-python"]
+	path = openai-agents-python
+	url = https://github.com/openai/openai-agents-python.git
+	shallow = true
+[submodule "openai-agents-js"]
+	path = openai-agents-js
+	url = https://github.com/openai/openai-agents-js.git
+	shallow = true
+[submodule "adk-python"]
+	path = adk-python
+	url = https://github.com/google/adk-python.git
+	shallow = true
+[submodule "smolagents"]
+	path = smolagents
+	url = https://github.com/huggingface/smolagents.git
+	shallow = true
+[submodule "pydantic-ai"]
+	path = pydantic-ai
+	url = https://github.com/pydantic/pydantic-ai.git
+	shallow = true
+[submodule "agno"]
+	path = agno
+	url = https://github.com/agno-agi/agno.git
+	shallow = true
+[submodule "agentscope"]
+	path = agentscope
+	url = https://github.com/agentscope-ai/agentscope.git
+	shallow = true
+[submodule "camel"]
+	path = camel
+	url = https://github.com/camel-ai/camel.git
+	shallow = true
+[submodule "llama-index"]
+	path = llama-index
+	url = https://github.com/run-llama/llama_index.git
+	shallow = true
+[submodule "letta"]
+	path = letta
+	url = https://github.com/letta-ai/letta.git
+	shallow = true
+[submodule "mastra"]
+	path = mastra
+	url = https://github.com/mastra-ai/mastra.git
+	shallow = true

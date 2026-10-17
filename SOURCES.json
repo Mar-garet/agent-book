@@ -1,0 +1,566 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-10-17T01:00:01.811276+00:00",
+  "repository_count": 32,
+  "clone_strategy": {
+    "depth": 1,
+    "single_branch": true,
+    "tags": false,
+    "recursive_submodules": true,
+    "shallow_submodules": true
+  },
+  "verification": [
+    "git clone completed successfully",
+    "clean tracked working tree",
+    "submodules checked out recursively",
+    "git fsck --connectivity-only --no-dangling",
+    "HEAD matches the recorded commit"
+  ],
+  "repositories": [
+    {
+      "name": "Codex CLI",
+      "directory": "codex",
+      "category": "coding",
+      "repository": "openai/codex",
+      "url": "https://github.com/openai/codex",
+      "clone_url": "https://github.com/openai/codex.git",
+      "branch": "main",
+      "commit": "5009a99dfc07830ddf7464c26f310a2b8532b55d",
+      "shallow": true,
+      "source_files": 9283,
+      "submodules": "",
+      "downloaded_at": "2026-10-17T00:56:35.386722+00:00",
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "name": "Gemini CLI",
+      "directory": "gemini-cli",
+      "category": "coding",
+      "repository": "google-gemini/gemini-cli",
+      "url": "https://github.com/google-gemini/gemini-cli",
+      "clone_url": "https://github.com/google-gemini/gemini-cli.git",
+      "branch": "main",
+      "commit": "ed96faedfd5571f055c44f2c9509d62321d1138d",
+      "shallow": true,
+      "source_files": 3027,
+      "submodules": "",
+      "downloaded_at": "2026-10-17T00:56:24.815622+00:00",
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "name": "OpenCode",
+      "directory": "opencode",
+      "category": "coding",
+      "repository": "anomalyco/opencode",
+      "url": "https://github.com/anomalyco/opencode",
+      "clone_url": "https://github.com/anomalyco/opencode.git",
+      "branch": "dev",
+      "commit": "65932e870ca50d21886f9d0ee89c6603bac34a65",
+      "shallow": true,
+      "source_files": 8557,
+      "submodules": "",
+      "downloaded_at": "2026-10-17T00:56:40.459464+00:00",
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "name": "Cline",
+      "directory": "cline",
+      "category": "coding",
+      "repository": "cline/cline",
+      "url": "https://github.com/cline/cline",
+      "clone_url": "https://github.com/cline/cline.git",
+      "branch": "main",
+      "commit": "b549ceb4bb4247284c975f6d6ca0979decec097c",
+      "shallow": true,
+      "source_files": 4286,
+      "submodules": "d1085569fb0ae3f9613957e6fc2706c6e2f7da9b evals/cline-bench (heads/main)",
+      "downloaded_at": "2026-10-17T00:56:31.889002+00:00",
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "name": "Aider",
+      "directory": "aider",
+      "category": "coding",
+      "repository": "Aider-AI/aider",
+      "url": "https://github.com/Aider-AI/aider",
+      "clone_url": "https://github.com/Aider-AI/aider.git",
+      "branch": "main",
+      "commit": "5dc9490bb35f9729ef2c95d00a19ccd30c26339c",
+      "shallow": true,
+      "source_files": 691,
+      "submodules": "",
+      "downloaded_at": "2026-10-17T00:56:36.950875+00:00",
+      "license_files": [
+        "LICENSE.txt"
+      ]
+    },
+    {
+      "name": "Qwen Code",
+      "directory": "qwen-code",
+      "category": "coding",
+      "repository": "QwenLM/qwen-code",
+      "url": "https://github.com/QwenLM/qwen-code",
+      "clone_url": "https://github.com/QwenLM/qwen-code.git",
+      "branch": "main",
+      "commit": "4e2753b006bde1bd42476c62161f6d6fd241c9bf",
+      "shallow": true,
+      "source_files": 11879,
+      "submodules": "",
+      "downloaded_at": "2026-10-17T00:57:17.720431+00:00",
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "name": "Pi",
+      "directory": "pi",
+      "category": "coding",
+      "repository": "earendil-works/pi",
+      "url": "https://github.com/earendil-works/pi",
+      "clone_url": "https://github.com/earendil-works/pi.git",
+      "branch": "main",
+      "commit": "8efd314fa3d3232ce197d8d7a6a5660530b9d83e",
+      "shallow": true,
+      "source_files": 1931,
+      "submodules": "",
+      "downloaded_at": "2026-10-17T00:56:40.515395+00:00",
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "name": "OpenHands",
+      "directory": "openhands",
+      "category": "coding",
+      "repository": "OpenHands/OpenHands",
+      "url": "https://github.com/OpenHands/OpenHands",
+      "clone_url": "https://github.com/OpenHands/OpenHands.git",
+      "branch": "main",
+      "commit": "045290739f0af2ae4cc89d2a209c6bd930bb81ee",
+      "shallow": true,
+      "source_files": 2716,
+      "submodules": "",
+      "downloaded_at": "2026-10-17T00:56:42.463999+00:00",
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "name": "Goose",
+      "directory": "goose",
+      "category": "general",
+      "repository": "aaif-goose/goose",
+      "url": "https://github.com/aaif-goose/goose",
+      "clone_url": "https://github.com/aaif-goose/goose.git",
+      "branch": "main",
+      "commit": "59e588dfd941ae129f2938deb7acf9f80b6edd02",
+      "shallow": true,
+      "source_files": 2534,
+      "submodules": "",
+      "downloaded_at": "2026-10-17T00:58:28.039624+00:00",
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "name": "OpenClaw",
+      "directory": "openclaw",
+      "category": "personal",
+      "repository": "openclaw/openclaw",
+      "url": "https://github.com/openclaw/openclaw",
+      "clone_url": "https://github.com/openclaw/openclaw.git",
+      "branch": "main",
+      "commit": "ec38f535d3d5de9e087d834fe58e6190852fcb2a",
+      "shallow": true,
+      "source_files": 56818,
+      "submodules": "",
+      "downloaded_at": "2026-10-17T00:58:46.367681+00:00",
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "name": "Hermes Agent",
+      "directory": "hermes-agent",
+      "category": "personal",
+      "repository": "NousResearch/hermes-agent",
+      "url": "https://github.com/NousResearch/hermes-agent",
+      "clone_url": "https://github.com/NousResearch/hermes-agent.git",
+      "branch": "main",
+      "commit": "e31c674f7c523070f48f3baad0650c2fdd7ef6e5",
+      "shallow": true,
+      "source_files": 19985,
+      "submodules": "",
+      "downloaded_at": "2026-10-17T00:57:35.047382+00:00",
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "name": "Browser Use",
+      "directory": "browser-use",
+      "category": "browser",
+      "repository": "browser-use/browser-use",
+      "url": "https://github.com/browser-use/browser-use",
+      "clone_url": "https://github.com/browser-use/browser-use.git",
+      "branch": "main",
+      "commit": "ccd22fef47a1a36e0c4596fef5db73a5117b9d06",
+      "shallow": true,
+      "source_files": 553,
+      "submodules": "",
+      "downloaded_at": "2026-10-17T00:57:23.383266+00:00",
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "name": "LangChain Python",
+      "directory": "langchain",
+      "category": "framework",
+      "repository": "langchain-ai/langchain",
+      "url": "https://github.com/langchain-ai/langchain",
+      "clone_url": "https://github.com/langchain-ai/langchain.git",
+      "branch": "master",
+      "commit": "bd5b134d876ef47858beef27bd29c81eeda03293",
+      "shallow": true,
+      "source_files": 3191,
+      "submodules": "",
+      "downloaded_at": "2026-10-17T00:57:54.579591+00:00",
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "name": "LangGraph Python",
+      "directory": "langgraph",
+      "category": "framework",
+      "repository": "langchain-ai/langgraph",
+      "url": "https://github.com/langchain-ai/langgraph",
+      "clone_url": "https://github.com/langchain-ai/langgraph.git",
+      "branch": "main",
+      "commit": "41c9c22fdc83d68a2859d0c9a2b627c8615a792f",
+      "shallow": true,
+      "source_files": 693,
+      "submodules": "",
+      "downloaded_at": "2026-10-17T00:57:46.057309+00:00",
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "name": "LangChain JS/TS",
+      "directory": "langchainjs",
+      "category": "framework",
+      "repository": "langchain-ai/langchainjs",
+      "url": "https://github.com/langchain-ai/langchainjs",
+      "clone_url": "https://github.com/langchain-ai/langchainjs.git",
+      "branch": "main",
+      "commit": "84eca2b11c0900a67775dca258ebec04f8e852a2",
+      "shallow": true,
+      "source_files": 2717,
+      "submodules": "",
+      "downloaded_at": "2026-10-17T00:57:55.248890+00:00",
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "name": "LangGraph JS/TS",
+      "directory": "langgraphjs",
+      "category": "framework",
+      "repository": "langchain-ai/langgraphjs",
+      "url": "https://github.com/langchain-ai/langgraphjs",
+      "clone_url": "https://github.com/langchain-ai/langgraphjs.git",
+      "branch": "main",
+      "commit": "cc29753d529caa5eed97a65e765ba26c0f88c631",
+      "shallow": true,
+      "source_files": 2002,
+      "submodules": "",
+      "downloaded_at": "2026-10-17T00:58:03.598418+00:00",
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "name": "Deep Agents",
+      "directory": "deepagents",
+      "category": "framework",
+      "repository": "langchain-ai/deepagents",
+      "url": "https://github.com/langchain-ai/deepagents",
+      "clone_url": "https://github.com/langchain-ai/deepagents.git",
+      "branch": "main",
+      "commit": "e80fd67dfaf5ef19f11a64c5d039f18b8b0c7b27",
+      "shallow": true,
+      "source_files": 1821,
+      "submodules": "",
+      "downloaded_at": "2026-10-17T00:58:22.892361+00:00",
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "name": "CrewAI",
+      "directory": "crewai",
+      "category": "multi-agent",
+      "repository": "crewAIInc/crewAI",
+      "url": "https://github.com/crewAIInc/crewAI",
+      "clone_url": "https://github.com/crewAIInc/crewAI.git",
+      "branch": "main",
+      "commit": "40bb2d3b586e8367d206090cc62df5242206008f",
+      "shallow": true,
+      "source_files": 35757,
+      "submodules": "",
+      "downloaded_at": "2026-10-17T00:59:21.314869+00:00",
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "name": "AutoGen",
+      "directory": "autogen",
+      "category": "multi-agent",
+      "repository": "microsoft/autogen",
+      "url": "https://github.com/microsoft/autogen",
+      "clone_url": "https://github.com/microsoft/autogen.git",
+      "branch": "main",
+      "commit": "004749e6b7102c8fd317b9b1499ce5807223c278",
+      "shallow": true,
+      "source_files": 1837,
+      "submodules": "",
+      "downloaded_at": "2026-10-17T00:58:32.263121+00:00",
+      "license_files": [
+        "LICENSE",
+        "LICENSE-CODE"
+      ]
+    },
+    {
+      "name": "Microsoft Agent Framework",
+      "directory": "agent-framework",
+      "category": "multi-agent",
+      "repository": "microsoft/agent-framework",
+      "url": "https://github.com/microsoft/agent-framework",
+      "clone_url": "https://github.com/microsoft/agent-framework.git",
+      "branch": "main",
+      "commit": "44fe223da7ea6853eefb7053e25c2c213a2e5c15",
+      "shallow": true,
+      "source_files": 5532,
+      "submodules": "",
+      "downloaded_at": "2026-10-17T00:58:46.353233+00:00",
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "name": "Semantic Kernel",
+      "directory": "semantic-kernel",
+      "category": "framework",
+      "repository": "microsoft/semantic-kernel",
+      "url": "https://github.com/microsoft/semantic-kernel",
+      "clone_url": "https://github.com/microsoft/semantic-kernel.git",
+      "branch": "main",
+      "commit": "7a92cd4e7c2712370b8d85b687a474b2e858cdcc",
+      "shallow": true,
+      "source_files": 4843,
+      "submodules": "",
+      "downloaded_at": "2026-10-17T00:58:48.957879+00:00",
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "name": "OpenAI Agents SDK Python",
+      "directory": "openai-agents-python",
+      "category": "sdk",
+      "repository": "openai/openai-agents-python",
+      "url": "https://github.com/openai/openai-agents-python",
+      "clone_url": "https://github.com/openai/openai-agents-python.git",
+      "branch": "main",
+      "commit": "9abc9182d06dbd28330af888306031269d57a175",
+      "shallow": true,
+      "source_files": 1696,
+      "submodules": "",
+      "downloaded_at": "2026-10-17T00:58:53.896364+00:00",
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "name": "OpenAI Agents SDK JS/TS",
+      "directory": "openai-agents-js",
+      "category": "sdk",
+      "repository": "openai/openai-agents-js",
+      "url": "https://github.com/openai/openai-agents-js",
+      "clone_url": "https://github.com/openai/openai-agents-js.git",
+      "branch": "main",
+      "commit": "9687b544c8c873080e6ff7e7d294c0b353cd9ab6",
+      "shallow": true,
+      "source_files": 1641,
+      "submodules": "",
+      "downloaded_at": "2026-10-17T00:58:54.225562+00:00",
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "name": "Google Agent Development Kit",
+      "directory": "adk-python",
+      "category": "sdk",
+      "repository": "google/adk-python",
+      "url": "https://github.com/google/adk-python",
+      "clone_url": "https://github.com/google/adk-python.git",
+      "branch": "main",
+      "commit": "0e968189596f93a0220f8f7bc63ebe3a569765a8",
+      "shallow": true,
+      "source_files": 2987,
+      "submodules": "",
+      "downloaded_at": "2026-10-17T00:58:59.636871+00:00",
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "name": "Smolagents",
+      "directory": "smolagents",
+      "category": "framework",
+      "repository": "huggingface/smolagents",
+      "url": "https://github.com/huggingface/smolagents",
+      "clone_url": "https://github.com/huggingface/smolagents.git",
+      "branch": "main",
+      "commit": "96f33faaf028479119ec8d34507b47694cf14e34",
+      "shallow": true,
+      "source_files": 185,
+      "submodules": "",
+      "downloaded_at": "2026-10-17T00:58:56.572373+00:00",
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "name": "Pydantic AI",
+      "directory": "pydantic-ai",
+      "category": "framework",
+      "repository": "pydantic/pydantic-ai",
+      "url": "https://github.com/pydantic/pydantic-ai",
+      "clone_url": "https://github.com/pydantic/pydantic-ai.git",
+      "branch": "main",
+      "commit": "bbe2790190c2d7c704fa80a338bed9a70938f988",
+      "shallow": true,
+      "source_files": 4558,
+      "submodules": "",
+      "downloaded_at": "2026-10-17T00:59:30.000217+00:00",
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "name": "Agno",
+      "directory": "agno",
+      "category": "framework",
+      "repository": "agno-agi/agno",
+      "url": "https://github.com/agno-agi/agno",
+      "clone_url": "https://github.com/agno-agi/agno.git",
+      "branch": "main",
+      "commit": "6e434823383280f33465121d3eeedeada2ff27d3",
+      "shallow": true,
+      "source_files": 6370,
+      "submodules": "",
+      "downloaded_at": "2026-10-17T00:59:22.164798+00:00",
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "name": "AgentScope",
+      "directory": "agentscope",
+      "category": "multi-agent",
+      "repository": "agentscope-ai/agentscope",
+      "url": "https://github.com/agentscope-ai/agentscope",
+      "clone_url": "https://github.com/agentscope-ai/agentscope.git",
+      "branch": "main",
+      "commit": "976e2ffc9c28869282bbcdde9a2661c48147ff3b",
+      "shallow": true,
+      "source_files": 1187,
+      "submodules": "",
+      "downloaded_at": "2026-10-17T00:59:09.394630+00:00",
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "name": "CAMEL",
+      "directory": "camel",
+      "category": "multi-agent",
+      "repository": "camel-ai/camel",
+      "url": "https://github.com/camel-ai/camel",
+      "clone_url": "https://github.com/camel-ai/camel.git",
+      "branch": "master",
+      "commit": "e5e55256e9446f744bf7309c478b084587dbf985",
+      "shallow": true,
+      "source_files": 2243,
+      "submodules": "",
+      "downloaded_at": "2026-10-17T00:59:33.442231+00:00",
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "name": "LlamaIndex",
+      "directory": "llama-index",
+      "category": "framework",
+      "repository": "run-llama/llama_index",
+      "url": "https://github.com/run-llama/llama_index",
+      "clone_url": "https://github.com/run-llama/llama_index.git",
+      "branch": "main",
+      "commit": "619d74664e8404612038bc15a1a40c686037277c",
+      "shallow": true,
+      "source_files": 9798,
+      "submodules": "",
+      "downloaded_at": "2026-10-17T00:59:52.345586+00:00",
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "name": "Letta",
+      "directory": "letta",
+      "category": "memory",
+      "repository": "letta-ai/letta",
+      "url": "https://github.com/letta-ai/letta",
+      "clone_url": "https://github.com/letta-ai/letta.git",
+      "branch": "main",
+      "commit": "5bcdd177d70fa2b31a754cfcd801e77b2e1ab16a",
+      "shallow": true,
+      "source_files": 12,
+      "submodules": "",
+      "downloaded_at": "2026-10-17T00:59:24.533546+00:00",
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "name": "Mastra",
+      "directory": "mastra",
+      "category": "framework",
+      "repository": "mastra-ai/mastra",
+      "url": "https://github.com/mastra-ai/mastra",
+      "clone_url": "https://github.com/mastra-ai/mastra.git",
+      "branch": "main",
+      "commit": "f8cb6873cfa2848c8fdd374454476ed49f173a33",
+      "shallow": true,
+      "source_files": 20780,
+      "submodules": "",
+      "downloaded_at": "2026-10-17T00:59:43.237225+00:00",
+      "license_files": [
+        "LICENSE.md"
+      ]
+    }
+  ]
+}
