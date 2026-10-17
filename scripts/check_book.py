@@ -40,6 +40,9 @@ def main() -> None:
     files = [root / 'README.md', root / 'AGENTS.md']
     for directory in ('book', 'docs', 'references', 'experiments'):
         files.extend(sorted((root / directory).rglob('*.md')))
+    reader_readme = root / 'website' / 'README.md'
+    if reader_readme.is_file():
+        files.append(reader_readme)
     errors: list[str] = []
     links_checked = 0
     citations_checked = 0

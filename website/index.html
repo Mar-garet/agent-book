@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f8f7f3" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <meta name="description" content="从零到深入，理解 Agent 的行动、上下文、记忆与协作。思想是主线，项目是案例，源码是证据。" />
+    <title>Agent Book · 你真的懂 Agent 吗？</title>
+    <script>
+      try {
+        const preference = JSON.parse(localStorage.getItem('agent-book-theme') || '"system"');
+        document.documentElement.dataset.theme = preference === 'system'
+          ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+          : preference;
+      } catch {}
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <noscript>请开启 JavaScript 使用阅读导航，或在 GitHub 直接阅读：<a href="https://github.com/Mar-garet/agent_book/blob/main/book/README.md">Agent Book 全书目录</a>。</noscript>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
